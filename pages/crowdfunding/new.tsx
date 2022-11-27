@@ -28,6 +28,9 @@ import { BsFillImageFill } from "react-icons/bs";
 import Step1 from "../../components/campaignSteps/step1";
 import Step2 from "../../components/campaignSteps/step2";
 import { BigNumber } from "ethers";
+import Step3 from "../../components/campaignSteps/step3";
+import Step4 from "../../components/campaignSteps/step4";
+import Step5 from "../../components/campaignSteps/step5";
 
 const Form3 = () => {
   return (
@@ -164,11 +167,18 @@ export type ICampaignBasicDetails = {
   completionDate: string;
 };
 
+export type ISocialDetails = {
+  name: string;
+  url: string;
+  slug: string;
+};
+
 export type ICampaignFormState = {
   adminDetails: IProfileDetails;
   basic: ICampaignBasicDetails;
   rewards: IRewardTier[];
   story: string;
+  socials: ISocialDetails[];
 };
 
 const blankCampaign = {
@@ -186,22 +196,44 @@ const blankCampaign = {
     subtitle: "This is a new Campaign for Grassroot Platform.",
     category: "",
     subcategory: "",
-    tags: [],
+    tags: ["social", "donation"],
     country: "",
     images: [],
     tokenCurrency: "",
-    minAmount:"",
-    goalAmount:"",
-    completionDate: new Date().toISOString(),
+    minAmount: "",
+    goalAmount: "",
+    completionDate: "",
   },
   rewards: [],
   story: "",
+  socials: [
+    {
+      name: "Twitter",
+      slug: "twitter",
+      url: "",
+    },
+    {
+      name: "Instagram",
+      slug: "instagram",
+      url: "",
+    },
+    {
+      name: "Discord",
+      slug: "discord",
+      url: "",
+    },
+    {
+      name: "Facebook",
+      slug: "facebook",
+      url: "",
+    },
+  ],
 };
 
 const Multistep = () => {
   const toast = useToast();
   const [step, setStep] = useState(1);
-  const [progress, setProgress] = useState(20.00);
+  const [progress, setProgress] = useState(20.0);
 
   const [campaignState, setCampaignState] = useState<ICampaignFormState>({
     ...blankCampaign,
@@ -213,7 +245,7 @@ const Multistep = () => {
       lastName: "Anuragi",
       address: "0xf2700a4f973998496F09051c2E1075de40D69F8B",
       avatar: "https://i.imgur.com/80HvW9r.png",
-      timezone: "IST",
+      timezone: "",
       biography: "A developer with a native love of Web3 and People's power.",
       websites: ["https://grassroot.uk"],
     };
@@ -229,9 +261,9 @@ const Multistep = () => {
   // Steps
   // Step 1 -> Admin Details
   // Step 2 -> Basic Details
-  // Step 3 -> Rewards Details
-  // Step 4 -> Story Details
-  // Step 5 -> Story Details
+  // Step 3 -> Story Details
+  // Step 4 -> Rewards Details
+  // Step 5 -> Social Detail
 
   const handleAdminChange = (key: string, value: string) => {
     setCampaignState({
@@ -253,6 +285,30 @@ const Multistep = () => {
     });
   };
 
+  const handleRewardChange = (reward: IRewardTier) => {
+    setCampaignState({
+      ...campaignState,
+      rewards: [...campaignState.rewards, reward],
+    });
+  };
+
+  const handleSocialChange = (slug: string, value: string) => {
+    const newSocials = campaignState.socials.map((social) => {
+      if (social.slug === slug) {
+        return {
+          ...social,
+          url: value,
+        };
+      } else {
+        return social;
+      }
+    });
+    setCampaignState({
+      ...campaignState,
+      socials: [...newSocials],
+    });
+  };
+
   const resolveFormStep = (step: number) => {
     switch (step) {
       case 1:
@@ -270,9 +326,35 @@ const Multistep = () => {
           />
         );
       case 3:
-        return <Form3 />;
+        return <Step3 />;
+      case 4:
+        return (
+          <Step4
+            rewards={campaignState.rewards}
+            setRewards={handleRewardChange}
+          />
+        );
+      case 5:
+        return (
+          <Step5
+            socials={campaignState.socials}
+            setSocial={handleSocialChange}
+          />
+        );
     }
   };
+
+  const handleCampaignSubmission = () => {
+    console.log("Submission Called");
+    console.log(campaignState);
+    toast({
+      title: "Account created.",
+      description: "We've created your account for you.",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  }
 
   return (
     <>
@@ -299,7 +381,7 @@ const Multistep = () => {
               <Button
                 onClick={() => {
                   setStep(step - 1);
-                  setProgress(progress - 33.33);
+                  setProgress(progress - 20.0);
                 }}
                 isDisabled={step === 1}
                 colorScheme="teal"
@@ -317,7 +399,7 @@ const Multistep = () => {
                   if (step === 5) {
                     setProgress(100);
                   } else {
-                    setProgress(progress + 20.00);
+                    setProgress(progress + 20.0);
                   }
                 }}
                 colorScheme="teal"
@@ -331,15 +413,7 @@ const Multistep = () => {
                 w="7rem"
                 colorScheme="red"
                 variant="solid"
-                onClick={() => {
-                  toast({
-                    title: "Account created.",
-                    description: "We've created your account for you.",
-                    status: "success",
-                    duration: 3000,
-                    isClosable: true,
-                  });
-                }}
+                onClick={handleCampaignSubmission}
               >
                 Submit
               </Button>

@@ -218,27 +218,27 @@ const Step1: React.FC<IForm1> = ({ adminDetails, setAdminDetails }) => {
               </InputGroup>
             );
           })}
-          <InputGroup size="md">
-            <Input
-              pr="4.5rem"
-              type={"text"}
-              placeholder="Enter a Website"
-              value={newWebsite}
-              onChange={(e) => setNewWebsite(e.target.value)}
-            />
-            <InputRightElement width="7.5rem">
-              <Button
-                h="1.75rem"
-                size="sm"
-                onClick={() => handleAddWebsite()}
-                colorScheme={"green"}
-              >
-                Add Website
-              </Button>
-            </InputRightElement>
-          </InputGroup>
         </Box>
       )}
+      <InputGroup size="md" my={3}>
+        <Input
+          pr="4.5rem"
+          type={"text"}
+          placeholder="Enter a Website"
+          value={newWebsite}
+          onChange={(e) => setNewWebsite(e.target.value)}
+        />
+        <InputRightElement width="7.5rem">
+          <Button
+            h="1.75rem"
+            size="sm"
+            onClick={() => handleAddWebsite()}
+            colorScheme={"green"}
+          >
+            Add Website
+          </Button>
+        </InputRightElement>
+      </InputGroup>
     </>
   );
 };

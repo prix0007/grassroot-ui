@@ -10,8 +10,14 @@ import {
   Box,
   Text,
   IconButton,
+  TagLabel,
+  TagCloseButton,
+  Tag,
+  InputGroup,
+  InputRightElement,
+  Button,
 } from "@chakra-ui/react";
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { ICampaignBasicDetails } from "../../pages/crowdfunding/new";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
@@ -119,6 +125,23 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
       (imgUrl, index) => index !== idx
     );
     setBasicDetails("images", newUrls);
+  };
+
+  const tagRef = useRef<HTMLInputElement>();
+
+  const handleAddTag = () => {
+    if (tagRef && tagRef.current) {
+      const ipTag = tagRef?.current.value as string;
+      console.log(ipTag);
+      const newTags = [...basicDetails?.tags, ipTag];
+      setBasicDetails("tags", newTags);
+      tagRef.current.value = "";
+    }
+  };
+
+  const handleRemoveTag = (idx: number) => {
+    const newTags = basicDetails?.tags.filter((tag, index) => index !== idx);
+    setBasicDetails("tags", newTags);
   };
 
   return (
@@ -302,7 +325,7 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
 
       <FormControl as={GridItem} colSpan={[6, 3]} my={3}>
         <FormLabel
-          htmlFor="country"
+          htmlFor="tokenCurrency"
           fontSize="md"
           fontWeight="md"
           color="gray.700"
@@ -313,16 +336,16 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
           Accepted Token
         </FormLabel>
         <Select
-          id="country"
-          name="country"
-          autoComplete="country"
-          placeholder="Select country"
+          id="tokenCurrency"
+          name="tokenCurrency"
+          autoComplete="tokenCurrency"
+          placeholder="Select tokenCurrency"
           focusBorderColor="brand.400"
           shadow="md"
           size="md"
           w="40%"
           rounded="md"
-          value={basicDetails.country}
+          value={basicDetails.tokenCurrency}
           onChange={handleChange}
         >
           {ACCEPTED_TOKENS?.map((token) => {
@@ -359,7 +382,7 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
                   borderRadius={"50px"}
                   size={"sm"}
                 >
-                  <CloseIcon color={"red.800"}/>
+                  <CloseIcon color={"red.800"} />
                 </IconButton>
                 <Image
                   src={imageUrl}
@@ -394,6 +417,44 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
           )}
         </Box>
       </Flex>
+
+      <Box>
+        <Text my={4}>Tags</Text>
+        {basicDetails.tags.map((tag, idx) => {
+          return (
+            <Tag
+              size={"md"}
+              key={tag + idx}
+              borderRadius="full"
+              variant="solid"
+              colorScheme="blue"
+              my={2}
+              mx={1}
+            >
+              <TagLabel>{tag}</TagLabel>
+              <TagCloseButton onClick={() => handleRemoveTag(idx)} />
+            </Tag>
+          );
+        })}
+        <InputGroup size="md">
+          <Input
+            pr="4.5rem"
+            type={"text"}
+            placeholder="Type to add a new tag."
+            ref={tagRef}
+          />
+          <InputRightElement width="7.5rem">
+            <Button
+              h="1.75rem"
+              size="sm"
+              onClick={() => handleAddTag()}
+              colorScheme={"green"}
+            >
+              Add Tag
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+      </Box>
 
       <FormControl as={GridItem} colSpan={6}>
         <FormLabel

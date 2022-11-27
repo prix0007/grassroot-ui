@@ -13,6 +13,7 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.0.12",
     "@chakra-ui/react": "^2.4.1",
+    "@emotion/css": "^11.10.5",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@ethersproject/bignumber": "^5.5.0",
@@ -31,6 +32,9 @@
     "react-dropzone": "^14.2.3",
     "react-icons": "^4.6.0",
     "react-jdenticon": "^1.0.0",
+    "slate": "^0.86.0",
+    "slate-history": "^0.86.0",
+    "slate-react": "^0.86.0",
     "swr": "^1.2.0"
   },
   "devDependencies": {
