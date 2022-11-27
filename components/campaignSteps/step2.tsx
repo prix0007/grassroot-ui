@@ -110,11 +110,9 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
   //   React Dropzone
   const onDrop = useCallback((acceptedFiles) => {
     // Do something with the files
-    console.log(acceptedFiles);
     const imgUrls = acceptedFiles.map((file: File, idx) => {
       return URL.createObjectURL(file);
     });
-    console.log(imgUrls);
     setBasicDetails("images", [...basicDetails.images, ...imgUrls]);
   }, []);
 
@@ -412,7 +410,7 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
             <Text>Drop the files here ...</Text>
           ) : (
             <Text color="blue.600">
-              Drag 'n' drop some files here, or click to select files
+              Drag &apos;n&apos; drop some files here, or click to select files
             </Text>
           )}
         </Box>

@@ -520,7 +520,7 @@ const New = () => {
         Fill out the form below to help us help you in your `cause`.
       </Heading>
       <Text textAlign={"center"} color={"blue.500"}>
-        It's totally free and autonomous, we don't take any charges on
+        It&apos;s totally free and autonomous, we don&apos;t take any charges on
         crowdfunding services.
       </Text>
       <Multistep />

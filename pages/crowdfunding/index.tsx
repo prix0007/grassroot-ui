@@ -1,6 +1,9 @@
 import { Box, Button, Container, Heading, Stack, Text } from "@chakra-ui/react";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+
+import how_r_u from "../../public/how_are_you.gif";
 
 const index = () => {
   return (
@@ -18,17 +21,15 @@ const index = () => {
           Welcome to Grassroot Crowdfunding Platform.
         </Heading>
         <Stack>
-          <Heading size={"sm"} color={"blue.700"} textAlign={"center"}>
+          <Heading size={"sm"} color={"blue.400"} textAlign={"center"}>
             Click on `Explore` to view campaigns
           </Heading>
-          <Heading size={"sm"} color={"blue.700"} textAlign={"center"}>
+          <Heading size={"sm"} color={"blue.400"} textAlign={"center"}>
             Click on `New` to create a new crowdfunding campaign
           </Heading>
         </Stack>
-        <Stack>
-          <Text>
-            Explaing on How it works or a GIF 
-          </Text>
+        <Stack display={"flex"} justifyContent={"center"} alignItems={"center"} py={10}>
+          <Image width={400} height={400} alt={"how are you"} src={how_r_u} />
         </Stack>
       </Stack>
     </Box>

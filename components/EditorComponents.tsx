@@ -43,6 +43,8 @@ export const Button = React.forwardRef(
   )
 );
 
+Button.displayName = "Button"
+
 export const EditorValue = React.forwardRef(
   (
     {
@@ -80,7 +82,7 @@ export const EditorValue = React.forwardRef(
             background: #f8f8f8;
           `}
         >
-          Slate's value as text
+          Slate&apos;s value as text
         </div>
         <div
           className={css`
@@ -99,6 +101,8 @@ export const EditorValue = React.forwardRef(
     );
   }
 );
+
+EditorValue.displayName = "EditorValue"
 
 export const Icon = React.forwardRef(
   (
@@ -119,6 +123,8 @@ export const Icon = React.forwardRef(
     />
   )
 );
+
+Icon.displayName = "Icon"
 
 export const Instruction = React.forwardRef(
   (
@@ -142,6 +148,8 @@ export const Instruction = React.forwardRef(
   )
 );
 
+Instruction.displayName = "Instruction"
+
 export const Menu = React.forwardRef(
   (
     { className, ...props }: PropsWithChildren<BaseProps>,
@@ -164,6 +172,8 @@ export const Menu = React.forwardRef(
     />
   )
 );
+
+Menu.displayName = "Menu"
 
 export const Portal = ({ children }) => {
   return typeof document === "object"
@@ -192,3 +202,5 @@ export const Toolbar = React.forwardRef(
     />
   )
 );
+
+Toolbar.displayName = "Toolbar"
