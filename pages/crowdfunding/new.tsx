@@ -19,6 +19,7 @@ import {
   InputRightElement,
   Text,
   Avatar,
+  CircularProgress,
 } from "@chakra-ui/react";
 
 import { useToast } from "@chakra-ui/react";
@@ -26,78 +27,16 @@ import BackButton from "../../components/BackButton";
 import { useRouter } from "next/router";
 import { BsFillImageFill } from "react-icons/bs";
 import Step1 from "../../components/campaignSteps/step1";
-import Step2 from "../../components/campaignSteps/step2";
-import { BigNumber } from "ethers";
+import Step2, { CATEGORIES } from "../../components/campaignSteps/step2";
+import { BigNumber, ethers } from "ethers";
 import Step3 from "../../components/campaignSteps/step3";
 import Step4 from "../../components/campaignSteps/step4";
 import Step5 from "../../components/campaignSteps/step5";
+import { useWeb3React } from "@web3-react/core";
+import useCrowdfundingContract from "../../hooks/useCrowdfundingContract";
 
-const Form3 = () => {
-  return (
-    <>
-      <Heading w="100%" textAlign={"center"} fontWeight="normal">
-        Social Handles
-      </Heading>
-      <SimpleGrid columns={1} spacing={6}>
-        <FormControl as={GridItem} colSpan={[3, 2]}>
-          <FormLabel
-            fontSize="sm"
-            fontWeight="md"
-            color="gray.700"
-            _dark={{
-              color: "gray.50",
-            }}
-          >
-            Website
-          </FormLabel>
-          <InputGroup size="sm">
-            <InputLeftAddon
-              bg="gray.50"
-              _dark={{
-                bg: "gray.800",
-              }}
-              color="gray.500"
-              rounded="md"
-            >
-              http://
-            </InputLeftAddon>
-            <Input
-              type="tel"
-              placeholder="www.example.com"
-              focusBorderColor="brand.400"
-              rounded="md"
-            />
-          </InputGroup>
-        </FormControl>
-
-        <FormControl id="email" mt={1}>
-          <FormLabel
-            fontSize="sm"
-            fontWeight="md"
-            color="gray.700"
-            _dark={{
-              color: "gray.50",
-            }}
-          >
-            About
-          </FormLabel>
-          <Textarea
-            placeholder="you@example.com"
-            rows={3}
-            shadow="sm"
-            focusBorderColor="brand.400"
-            fontSize={{
-              sm: "sm",
-            }}
-          />
-          <FormHelperText>
-            Brief description for your profile. URLs are hyperlinked.
-          </FormHelperText>
-        </FormControl>
-      </SimpleGrid>
-    </>
-  );
-};
+const CROWDFUNDING_CONTRACT_ADDRESS =
+  "0x6ddC3Bde48ADdE719dee30200587A484b5db2bd7";
 
 // TODO: Rules show in a Modal
 
@@ -192,11 +131,11 @@ const blankCampaign = {
     websites: [],
   },
   basic: {
-    title: "My New Campaign",
-    subtitle: "This is a new Campaign for Grassroot Platform.",
+    title: "",
+    subtitle: "",
     category: "",
     subcategory: "",
-    tags: ["social", "donation"],
+    tags: ["others"],
     country: "",
     images: [],
     tokenCurrency: "",
@@ -235,28 +174,28 @@ const Multistep = () => {
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(20.0);
 
+  // State Loading Submission
+  const [isLoading, setLoading] = useState(false);
+
+  const { account, chainId } = useWeb3React();
+
+  const crowdfundingContract = useCrowdfundingContract(
+    CROWDFUNDING_CONTRACT_ADDRESS
+  );
+
   const [campaignState, setCampaignState] = useState<ICampaignFormState>({
     ...blankCampaign,
   });
 
   useEffect(() => {
-    const sampleAdminDetails = {
-      firstName: "Prince",
-      lastName: "Anuragi",
-      address: "0xf2700a4f973998496F09051c2E1075de40D69F8B",
-      avatar: "https://i.imgur.com/80HvW9r.png",
-      timezone: "",
-      biography: "A developer with a native love of Web3 and People's power.",
-      websites: ["https://grassroot.uk"],
-    };
-
     setCampaignState({
       ...campaignState,
       adminDetails: {
-        ...sampleAdminDetails,
+        ...campaignState.adminDetails,
+        address: account,
       },
     });
-  }, []);
+  }, [account]);
 
   // Steps
   // Step 1 -> Admin Details
@@ -351,7 +290,7 @@ const Multistep = () => {
         // Checks for firstName, lastName, address, biography
 
         ["firstName", "lastName", "address", "biography"].forEach((key) => {
-          if (campaignState.adminDetails[key].trim().length < 1) {
+          if (campaignState.adminDetails[key]?.trim().length < 1) {
             toast({
               title: `${key} is required`,
               status: "error",
@@ -412,18 +351,16 @@ const Multistep = () => {
   };
 
   const handleCampaignSubmission = async () => {
-    console.log("Submission Called");
-    console.log(campaignState);
     const campaignStory = JSON.parse(localStorage.getItem("story"));
-    console.log(campaignStory);
 
     const metadata = {
       ...campaignState,
       story: JSON.stringify(campaignStory),
+      version: "0.1",
     };
 
     console.log("File Metadata Pushing", metadata);
-
+    setLoading(true);
     try {
       const res = await fetch("/api/storage", {
         method: "POST",
@@ -437,6 +374,33 @@ const Multistep = () => {
 
       console.log(cid);
 
+      const DECIMALS = 18;
+      const futureUnixTimeStamp = new Date(
+        metadata.basic.completionDate
+      ).getTime();
+      const offset = futureUnixTimeStamp - Date.now();
+
+      const finalBCObj = {
+        adminAddress: account,
+        tokenAddress: metadata.basic.tokenCurrency,
+        campaignName: ethers.utils.formatBytes32String(metadata.basic.title),
+        metadataCid: cid,
+        minAmountContribution: ethers.utils.parseUnits(
+          metadata.basic.minAmount,
+          DECIMALS
+        ),
+        targetAmount: ethers.utils.parseUnits(
+          metadata.basic.goalAmount,
+          DECIMALS
+        ),
+        category: CATEGORIES.findIndex(
+          (category) => category === metadata.basic.category
+        ),
+        validUntil: parseInt((offset / 1000).toString()),
+      };
+
+      console.log(finalBCObj);
+
       toast({
         title: "Metadata Uploaded",
         description: `Your metadata has been uploaded at ${cid}. Please sign the transaction with metamask to publish it on blockchain.`,
@@ -445,9 +409,44 @@ const Multistep = () => {
         isClosable: true,
       });
 
+      try {
+        const tx = await crowdfundingContract.createCampaign(
+          finalBCObj.adminAddress,
+          finalBCObj.tokenAddress,
+          finalBCObj.campaignName,
+          finalBCObj.metadataCid,
+          finalBCObj.minAmountContribution,
+          finalBCObj.targetAmount,
+          finalBCObj.category,
+          finalBCObj.validUntil
+        );
+        await tx.wait();
+        toast({
+          title: "Campaign Created Successfully.",
+          description: `Your transaction has been successfully sent.`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (e) {
+        console.log(e);
+        toast({
+          title: "Something went wrong.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+
+      // localStorage.setItem("story", "");
     } catch (e) {
       console.log(e);
     }
+    setLoading(false);
+  };
+
+  const handleConnectionValidation = () => {
+    return account && chainId === 80001;
   };
 
   return (
@@ -482,6 +481,7 @@ const Multistep = () => {
                 variant="solid"
                 w="7rem"
                 mr="5%"
+                disabled={isLoading}
               >
                 Back
               </Button>
@@ -490,8 +490,20 @@ const Multistep = () => {
                 isDisabled={step === 5}
                 onClick={() => {
                   const { success } = handleStepValidation(step);
+                  const isValidNetwork = handleConnectionValidation();
+
+                  if (!isValidNetwork) {
+                    toast({
+                      title: `Connection not found.`,
+                      description:
+                        "Make sure you are connected to your metamask, and you are on polygon mumbai testnet.",
+                      status: "error",
+                      duration: 3000,
+                      isClosable: true,
+                    });
+                  }
                   console.log(success);
-                  if (success) {
+                  if (success && isValidNetwork) {
                     setStep(step + 1);
                     if (step === 5) {
                       setProgress(100);
@@ -512,8 +524,17 @@ const Multistep = () => {
                 colorScheme="red"
                 variant="solid"
                 onClick={handleCampaignSubmission}
+                disabled={isLoading}
               >
-                Submit
+                {isLoading ? (
+                  <CircularProgress
+                    color="green.900"
+                    isIndeterminate
+                    size={10}
+                  />
+                ) : (
+                  "Submit"
+                )}
               </Button>
             ) : null}
           </Flex>
@@ -534,7 +555,7 @@ const New = () => {
       <br />
       <BackButton onClick={handleBack} />
       <br />
-      <Heading textAlign={"center"}>Create a new Crowdfunding Campaign</Heading>
+      <Heading textAlign={"center"}>Create a new DAO Campaign</Heading>
       <Heading
         textAlign={"center"}
         size={"sm"}
@@ -545,8 +566,8 @@ const New = () => {
         Fill out the form below to help us help you in your `cause`.
       </Heading>
       <Text textAlign={"center"} color={"blue.500"}>
-        It&apos;s totally free and autonomous, we don&apos;t take any charges on
-        crowdfunding services.
+        It&apos;s totally autonomous, we don&apos;t take any charges on extra
+        services, only 2% if your goal is reached.
       </Text>
       <Multistep />
     </Box>

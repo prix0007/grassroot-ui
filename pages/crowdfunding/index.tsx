@@ -18,7 +18,7 @@ const index = () => {
       </Stack>
       <Stack direction={"column"}>
         <Heading textAlign={"center"} size={"xl"} as={"h3"}>
-          Welcome to Grassroot Crowdfunding Platform.
+          Welcome to Grassroot Crowdfunding.
         </Heading>
         <Stack>
           <Heading size={"sm"} color={"blue.400"} textAlign={"center"}>

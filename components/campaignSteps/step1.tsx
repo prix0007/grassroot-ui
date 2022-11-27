@@ -100,7 +100,7 @@ const Step1: React.FC<IForm1> = ({ adminDetails, setAdminDetails }) => {
   return (
     <>
       <Heading w="100%" textAlign={"center"} fontWeight="normal" mb="2%">
-        Campaign Creator Details
+        DAO Creator Details
       </Heading>
       {/* Optional Avatar */}
 

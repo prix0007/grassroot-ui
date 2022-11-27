@@ -41,7 +41,7 @@ type IForm2 = {
 // - Goal Amount
 // - Completion Date
 
-const CATEGORIES = ["electronics", "arts", "social", "buisness", "product"];
+export const CATEGORIES = ["electronics", "arts", "social", "buisness", "product"];
 const SUBCATEGORIES = {
   electronics: ["personal", "gadget", "phone", "others"],
   arts: ["digital collection", "museum", "charity art", "NFTs", "others"],

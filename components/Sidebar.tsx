@@ -48,8 +48,11 @@ import { useWeb3React } from "@web3-react/core";
 import useEagerConnect from "../hooks/useEagerConnect";
 import TokenBalance from "./TokenBalance";
 import BuyToken from "./BuyToken";
+import useCrowdfundingContract from "../hooks/useCrowdfundingContract";
 
 const USDC_TOKEN_ADDRESS = "0xd506311f5fb228974fa81c747354307ed3fbead5";
+const CROWDFUNDING_CONTRACT_ADDRESS =
+  "0x6ddC3Bde48ADdE719dee30200587A484b5db2bd7";
 
 interface LinkItemProps {
   name: string;
@@ -111,6 +114,10 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   const triedToEagerConnect = useEagerConnect();
 
   const isConnected = typeof account === "string" && !!library;
+
+  // const crowdfundingContract = useCrowdfundingContract(
+  //   CROWDFUNDING_CONTRACT_ADDRESS
+  // );
 
   return (
     <Box w={{ base: "full", md: 60 }} pos="fixed" h="full" {...rest}>
@@ -198,6 +205,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       <TokenBalance symbol="USDC" tokenAddress={USDC_TOKEN_ADDRESS} />
       <br />
       <BuyToken tokenAddress={USDC_TOKEN_ADDRESS} />
+      <br />
     </Box>
   );
 };
