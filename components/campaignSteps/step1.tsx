@@ -175,22 +175,19 @@ const Step1: React.FC<IForm1> = ({ adminDetails, setAdminDetails }) => {
         <Input id="address" type="text" disabled value={adminDetails.address} />
         <FormHelperText>This is prefilled your ETH Address.</FormHelperText>
       </FormControl>
+      <FormControl mt="2%">
+        <FormLabel htmlFor="biography" fontWeight={"normal"}>
+          Biography
+        </FormLabel>
+        <Textarea
+          id="biography"
+          name="biography"
+          placeholder="Enter about yourself"
+          onChange={handleChange}
+          value={adminDetails.biography}
+        />
+      </FormControl>
 
-      {/* Optional Biography */}
-      {adminDetails.biography && (
-        <FormControl mt="2%">
-          <FormLabel htmlFor="biography" fontWeight={"normal"}>
-            Biography
-          </FormLabel>
-          <Textarea
-            id="biography"
-            name="biography"
-            placeholder="Enter about yourself"
-            onChange={handleChange}
-            value={adminDetails.biography}
-          />
-        </FormControl>
-      )}
       {/* Optional Websites */}
       {adminDetails.websites.length > 0 && (
         <Box>

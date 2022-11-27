@@ -344,9 +344,78 @@ const Multistep = () => {
     }
   };
 
+  const handleStepValidation = (step: number): { success: boolean } => {
+    let isValid = true;
+    switch (step) {
+      case 1:
+        // Checks for firstName, lastName, address, biography
+
+        ["firstName", "lastName", "address", "biography"].forEach((key) => {
+          if (campaignState.adminDetails[key].trim().length < 1) {
+            toast({
+              title: `${key} is required`,
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
+            isValid = false;
+          }
+        });
+        return { success: isValid };
+        break;
+      case 2:
+        [
+          "title",
+          "subtitle",
+          "category",
+          "subcategory",
+          "country",
+          "tokenCurrency",
+          "minAmount",
+          "goalAmount",
+          "completionDate",
+        ].forEach((key) => {
+          if (campaignState.basic[key].trim().length < 1) {
+            toast({
+              title: `${key} is required`,
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
+            isValid = false;
+          }
+        });
+        if (campaignState.basic.images.length === 0) {
+          toast({
+            title: `Atleast one image is required!`,
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+          isValid = false;
+        }
+        return { success: isValid };
+        break;
+      case 3:
+        // No Checks as Story is optional..
+        return { success: true };
+        break;
+      case 4:
+        // No Checks as these are optional..
+        return { success: true };
+        break;
+      case 5:
+        // No Checks as Social Links are optional..
+        return { success: true };
+        break;
+    }
+  };
+
   const handleCampaignSubmission = () => {
     console.log("Submission Called");
     console.log(campaignState);
+    const campaignStory = JSON.parse(localStorage.getItem("story"));
+    console.log(campaignStory);
     toast({
       title: "Account created.",
       description: "We've created your account for you.",
@@ -354,7 +423,7 @@ const Multistep = () => {
       duration: 3000,
       isClosable: true,
     });
-  }
+  };
 
   return (
     <>
@@ -395,11 +464,15 @@ const Multistep = () => {
                 w="7rem"
                 isDisabled={step === 5}
                 onClick={() => {
-                  setStep(step + 1);
-                  if (step === 5) {
-                    setProgress(100);
-                  } else {
-                    setProgress(progress + 20.0);
+                  const { success } = handleStepValidation(step);
+                  console.log(success);
+                  if (success) {
+                    setStep(step + 1);
+                    if (step === 5) {
+                      setProgress(100);
+                    } else {
+                      setProgress(progress + 20.0);
+                    }
                   }
                 }}
                 colorScheme="teal"
