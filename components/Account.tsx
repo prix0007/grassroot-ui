@@ -1,6 +1,8 @@
+import { Box, Button } from "@chakra-ui/react";
 import { useWeb3React } from "@web3-react/core";
 import { UserRejectedRequestError } from "@web3-react/injected-connector";
 import { useEffect, useState } from "react";
+import { GiFoxTail, GiWallet } from "react-icons/gi";
 import { injected } from "../connectors";
 import useENSName from "../hooks/useENSName";
 import useMetaMaskOnboarding from "../hooks/useMetaMaskOnboarding";
@@ -40,12 +42,31 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
     return null;
   }
 
+  const resolveButton = () => {
+    if (isMetaMaskInstalled) {
+      return (
+        <Box display={"flex"} minW={"80px"} justifyContent={"space-between"}>
+          <p>Connect</p>
+          <GiFoxTail />
+        </Box>
+      );
+    } else {
+      return (
+        <Box display={"flex"} minW={"80px"} justifyContent={"space-between"}>
+          <p>Connect</p>
+          <GiWallet />
+        </Box>
+      );
+    }
+  };
+
   if (typeof account !== "string") {
     return (
       <div>
         {isWeb3Available ? (
-          <button
+          <Button
             disabled={connecting}
+            borderRadius={"full"}
             onClick={() => {
               setConnecting(true);
 
@@ -59,26 +80,14 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
               });
             }}
           >
-            {isMetaMaskInstalled ? "Connect to MetaMask" : "Connect to Wallet"}
-          </button>
+            {resolveButton()}
+          </Button>
         ) : (
-          <button onClick={startOnboarding}>Install Metamask</button>
+          <Button onClick={startOnboarding}>Install Metamask</Button>
         )}
       </div>
     );
   }
-
-  return (
-    <a
-      {...{
-        href: formatEtherscanLink("Account", [chainId, account]),
-        target: "_blank",
-        rel: "noopener noreferrer",
-      }}
-    >
-      {ENSName || `${shortenHex(account, 4)}`}
-    </a>
-  );
 };
 
 export default Account;

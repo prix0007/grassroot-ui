@@ -19,7 +19,7 @@ function Home() {
   return (
     <div>
       <Head>
-        <title>Grassroot UI</title>
+        <title>Grassroot</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
     </div>

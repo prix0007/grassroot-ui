@@ -113,6 +113,7 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
     const imgUrls = acceptedFiles.map((file: File, idx) => {
       return URL.createObjectURL(file);
     });
+    // TODO: Some Bug here or on image selection cause dropdown menu's to reset on Drop or on Click Select
     setBasicDetails("images", [...basicDetails.images, ...imgUrls]);
   }, []);
 
@@ -365,7 +366,7 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
           Images
         </Heading>
         <Flex flexWrap={"wrap"}>
-          {basicDetails.images.map((imageUrl, idx) => {
+          {basicDetails?.images.map((imageUrl, idx) => {
             return (
               <Box m={2} key={imageUrl + idx} position={"relative"}>
                 <IconButton

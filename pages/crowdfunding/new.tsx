@@ -411,18 +411,43 @@ const Multistep = () => {
     }
   };
 
-  const handleCampaignSubmission = () => {
+  const handleCampaignSubmission = async () => {
     console.log("Submission Called");
     console.log(campaignState);
     const campaignStory = JSON.parse(localStorage.getItem("story"));
     console.log(campaignStory);
-    toast({
-      title: "Account created.",
-      description: "We've created your account for you.",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
+
+    const metadata = {
+      ...campaignState,
+      story: JSON.stringify(campaignStory),
+    };
+
+    console.log("File Metadata Pushing", metadata);
+
+    try {
+      const res = await fetch("/api/storage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(metadata),
+      });
+
+      const { cid } = await res.json();
+
+      console.log(cid);
+
+      toast({
+        title: "Metadata Uploaded",
+        description: `Your metadata has been uploaded at ${cid}. Please sign the transaction with metamask to publish it on blockchain.`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (

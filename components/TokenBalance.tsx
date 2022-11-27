@@ -1,3 +1,4 @@
+import { Text } from "@chakra-ui/react";
 import type { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 import useTokenBalance from "../hooks/useTokenBalance";
@@ -13,9 +14,9 @@ const TokenBalance = ({ tokenAddress, symbol }: TokenBalanceProps) => {
   const { data } = useTokenBalance(account, tokenAddress);
 
   return (
-    <p>
-      {`${symbol} Balance`}: {parseBalance(data ?? 0)}
-    </p>
+    <Text textAlign={"center"} my={3} mx={2}>
+      {`${symbol} Balance`}: {parseBalance(data ?? 0, 18, 2)}
+    </Text>
   );
 };
 

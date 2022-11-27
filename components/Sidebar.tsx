@@ -43,9 +43,13 @@ import grassrootIcon from "../public/grassroot_full.png";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import ETHBalance from "./ETHBalance";
 import Account from "./Account";
-import { shortenHex } from "../util";
+import { formatEtherscanLink, shortenHex } from "../util";
 import { useWeb3React } from "@web3-react/core";
 import useEagerConnect from "../hooks/useEagerConnect";
+import TokenBalance from "./TokenBalance";
+import BuyToken from "./BuyToken";
+
+const USDC_TOKEN_ADDRESS = "0xd506311f5fb228974fa81c747354307ed3fbead5";
 
 interface LinkItemProps {
   name: string;
@@ -102,7 +106,7 @@ interface SidebarProps extends BoxProps {
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   const { colorMode, toggleColorMode } = useColorMode();
 
-  const { account, library } = useWeb3React();
+  const { account, library, chainId, deactivate } = useWeb3React();
 
   const triedToEagerConnect = useEagerConnect();
 
@@ -120,40 +124,53 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         <Button onClick={toggleColorMode}>
           {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
         </Button>
-        <Menu>
-          <MenuButton
-            as={Button}
-            rounded={"full"}
-            variant={"link"}
-            cursor={"pointer"}
-            _hover={{
-              border: "gray.800",
-              borderWidth: "1px",
-            }}
-            minW={0}
-          >
-            <Jdenticon size={"30"} value={account || ""} />
-          </MenuButton>
-          <MenuList alignItems={"center"}>
-            <br />
-            <Center>
-              <Jdenticon size={"50"} value={account || ""} />
-            </Center>
-            <Center>
-              <p>{account && shortenHex(account, 4)}</p>
-            </Center>
-            <br />
-            <MenuDivider />
-            <MenuItem>Your Profile</MenuItem>
-            <MenuItem>
-              <ETHBalance />
-            </MenuItem>
-            <MenuItem>Logout</MenuItem>
-            <MenuItem>
-              <Account triedToEagerConnect={triedToEagerConnect} />
-            </MenuItem>
-          </MenuList>
-        </Menu>
+        <Account triedToEagerConnect={triedToEagerConnect} />
+        {isConnected && (
+          <Menu>
+            <MenuButton
+              as={Button}
+              rounded={"full"}
+              variant={"link"}
+              cursor={"pointer"}
+              p={2}
+              _hover={{
+                background: "gray.700",
+              }}
+              minW={0}
+            >
+              <Jdenticon value={account} size={"30"} />
+            </MenuButton>
+            <MenuList alignItems={"center"}>
+              <br />
+              <Center>
+                <Jdenticon size={"50"} value={account || ""} />
+              </Center>
+              <Center>
+                <a
+                  {...{
+                    href: formatEtherscanLink("Account", [chainId, account]),
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  }}
+                >
+                  {account && `${shortenHex(account, 4)}`}
+                </a>
+              </Center>
+              <br />
+              <MenuDivider />
+              <MenuItem>
+                <Link href={`/profile/${account}`}>Your Profile</Link>
+              </MenuItem>
+              <MenuItem>
+                <ETHBalance />
+              </MenuItem>
+              <MenuItem onClick={deactivate} textColor={"red.600"}>
+                Logout
+              </MenuItem>
+              <MenuItem></MenuItem>
+            </MenuList>
+          </Menu>
+        )}
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Stack>
       <Box px={2} mb={4}>
@@ -163,12 +180,14 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           display={"flex"}
           justifyContent={"center"}
         >
-          <Image
-            src={grassrootIcon}
-            alt={"Grassroot Icon"}
-            width={170}
-            height={70}
-          />
+          <Link href="/">
+            <Image
+              src={grassrootIcon}
+              alt={"Grassroot Icon"}
+              width={170}
+              height={70}
+            />
+          </Link>
         </Box>
       </Box>
       {LinkItems.map((link) => (
@@ -176,6 +195,9 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           <Link href={link.href}>{link.name}</Link>
         </NavItem>
       ))}
+      <TokenBalance symbol="USDC" tokenAddress={USDC_TOKEN_ADDRESS} />
+      <br />
+      <BuyToken tokenAddress={USDC_TOKEN_ADDRESS} />
     </Box>
   );
 };
