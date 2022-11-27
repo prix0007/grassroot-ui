@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Progress,
   Box,
@@ -18,203 +18,16 @@ import {
   FormHelperText,
   InputRightElement,
   Text,
+  Avatar,
 } from "@chakra-ui/react";
 
 import { useToast } from "@chakra-ui/react";
-
-const Form1 = () => {
-  const [show, setShow] = React.useState(false);
-  const handleClick = () => setShow(!show);
-  return (
-    <>
-      <Heading w="100%" textAlign={"center"} fontWeight="normal" mb="2%">
-        Campaign Registration
-      </Heading>
-      <Flex>
-        <FormControl mr="5%">
-          <FormLabel htmlFor="first-name" fontWeight={"normal"}>
-            First name
-          </FormLabel>
-          <Input id="first-name" placeholder="First name" />
-        </FormControl>
-
-        <FormControl>
-          <FormLabel htmlFor="last-name" fontWeight={"normal"}>
-            Last name
-          </FormLabel>
-          <Input id="last-name" placeholder="First name" />
-        </FormControl>
-      </Flex>
-      <FormControl mt="2%">
-        <FormLabel htmlFor="email" fontWeight={"normal"}>
-          Your ETH Address
-        </FormLabel>
-        <Input id="email" type="email" />
-        <FormHelperText>We&apos;ll never share your email.</FormHelperText>
-      </FormControl>
-
-      <FormControl>
-        <FormLabel htmlFor="password" fontWeight={"normal"} mt="2%">
-          Password
-        </FormLabel>
-        <InputGroup size="md">
-          <Input
-            pr="4.5rem"
-            type={show ? "text" : "password"}
-            placeholder="Enter password"
-          />
-          <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? "Hide" : "Show"}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-      </FormControl>
-    </>
-  );
-};
-
-const Form2 = () => {
-  return (
-    <>
-      <Heading w="100%" textAlign={"center"} fontWeight="normal" mb="2%">
-        User Details
-      </Heading>
-      <FormControl as={GridItem} colSpan={[6, 3]}>
-        <FormLabel
-          htmlFor="country"
-          fontSize="sm"
-          fontWeight="md"
-          color="gray.700"
-          _dark={{
-            color: "gray.50",
-          }}
-        >
-          Country / Region
-        </FormLabel>
-        <Select
-          id="country"
-          name="country"
-          autoComplete="country"
-          placeholder="Select option"
-          focusBorderColor="brand.400"
-          shadow="sm"
-          size="sm"
-          w="full"
-          rounded="md"
-        >
-          <option>United States</option>
-          <option>Canada</option>
-          <option>Mexico</option>
-        </Select>
-      </FormControl>
-
-      <FormControl as={GridItem} colSpan={6}>
-        <FormLabel
-          htmlFor="street_address"
-          fontSize="sm"
-          fontWeight="md"
-          color="gray.700"
-          _dark={{
-            color: "gray.50",
-          }}
-          mt="2%"
-        >
-          Street address
-        </FormLabel>
-        <Input
-          type="text"
-          name="street_address"
-          id="street_address"
-          autoComplete="street-address"
-          focusBorderColor="brand.400"
-          shadow="sm"
-          size="sm"
-          w="full"
-          rounded="md"
-        />
-      </FormControl>
-
-      <FormControl as={GridItem} colSpan={[6, 6, null, 2]}>
-        <FormLabel
-          htmlFor="city"
-          fontSize="sm"
-          fontWeight="md"
-          color="gray.700"
-          _dark={{
-            color: "gray.50",
-          }}
-          mt="2%"
-        >
-          City
-        </FormLabel>
-        <Input
-          type="text"
-          name="city"
-          id="city"
-          autoComplete="city"
-          focusBorderColor="brand.400"
-          shadow="sm"
-          size="sm"
-          w="full"
-          rounded="md"
-        />
-      </FormControl>
-
-      <FormControl as={GridItem} colSpan={[6, 3, null, 2]}>
-        <FormLabel
-          htmlFor="state"
-          fontSize="sm"
-          fontWeight="md"
-          color="gray.700"
-          _dark={{
-            color: "gray.50",
-          }}
-          mt="2%"
-        >
-          State / Province
-        </FormLabel>
-        <Input
-          type="text"
-          name="state"
-          id="state"
-          autoComplete="state"
-          focusBorderColor="brand.400"
-          shadow="sm"
-          size="sm"
-          w="full"
-          rounded="md"
-        />
-      </FormControl>
-
-      <FormControl as={GridItem} colSpan={[6, 3, null, 2]}>
-        <FormLabel
-          htmlFor="postal_code"
-          fontSize="sm"
-          fontWeight="md"
-          color="gray.700"
-          _dark={{
-            color: "gray.50",
-          }}
-          mt="2%"
-        >
-          ZIP / Postal
-        </FormLabel>
-        <Input
-          type="text"
-          name="postal_code"
-          id="postal_code"
-          autoComplete="postal-code"
-          focusBorderColor="brand.400"
-          shadow="sm"
-          size="sm"
-          w="full"
-          rounded="md"
-        />
-      </FormControl>
-    </>
-  );
-};
+import BackButton from "../../components/BackButton";
+import { useRouter } from "next/router";
+import { BsFillImageFill } from "react-icons/bs";
+import Step1 from "../../components/campaignSteps/step1";
+import Step2 from "../../components/campaignSteps/step2";
+import { BigNumber } from "ethers";
 
 const Form3 = () => {
   return (
@@ -283,10 +96,184 @@ const Form3 = () => {
   );
 };
 
+// TODO: Rules show in a Modal
+
+// Profile
+// - FirstName
+// - LastName
+// - Address
+// - Avatar Image
+// - Timezone
+// - Biography
+// - Websites[]
+
+// Steps
+
+// Basics
+// - Title
+// - Subtitils
+// - Category
+// - SubCategory
+// - Project Location
+// - Tags
+// - Images
+// - Videos
+// - Token Currency
+// - Goal Amount
+// - Completion Date
+
+// Rewards
+// - Reward Tiers
+// - + Title
+// - + Min Pledge Amount
+// - + Reward Type
+// - + Reward Description
+
+// Story
+// - Write your story about project (make it like a text Editor)
+
+export type IRewardTier = {
+  title: string;
+  minAmount: string;
+  rewardType: string;
+  rewardDescription: string;
+};
+
+export type IProfileDetails = {
+  firstName: string;
+  lastName: string;
+  address: string;
+  avatar?: string;
+  timezone?: string;
+  biography?: string;
+  websites?: string[];
+};
+
+export type ICampaignBasicDetails = {
+  title: string;
+  subtitle: string;
+  category: string;
+  subcategory: string;
+  tags: string[];
+  country: string;
+  images: string[];
+  videos?: string[];
+  tokenCurrency: string; // ERC20 Token Address
+  minAmount: string;
+  goalAmount: string;
+  completionDate: string;
+};
+
+export type ICampaignFormState = {
+  adminDetails: IProfileDetails;
+  basic: ICampaignBasicDetails;
+  rewards: IRewardTier[];
+  story: string;
+};
+
+const blankCampaign = {
+  adminDetails: {
+    firstName: "",
+    lastName: "",
+    address: "",
+    avatar: "",
+    timezone: "",
+    biography: "",
+    websites: [],
+  },
+  basic: {
+    title: "My New Campaign",
+    subtitle: "This is a new Campaign for Grassroot Platform.",
+    category: "",
+    subcategory: "",
+    tags: [],
+    country: "",
+    images: [],
+    tokenCurrency: "",
+    minAmount:"",
+    goalAmount:"",
+    completionDate: new Date().toISOString(),
+  },
+  rewards: [],
+  story: "",
+};
+
 const Multistep = () => {
   const toast = useToast();
   const [step, setStep] = useState(1);
-  const [progress, setProgress] = useState(33.33);
+  const [progress, setProgress] = useState(20.00);
+
+  const [campaignState, setCampaignState] = useState<ICampaignFormState>({
+    ...blankCampaign,
+  });
+
+  useEffect(() => {
+    const sampleAdminDetails = {
+      firstName: "Prince",
+      lastName: "Anuragi",
+      address: "0xf2700a4f973998496F09051c2E1075de40D69F8B",
+      avatar: "https://i.imgur.com/80HvW9r.png",
+      timezone: "IST",
+      biography: "A developer with a native love of Web3 and People's power.",
+      websites: ["https://grassroot.uk"],
+    };
+
+    setCampaignState({
+      ...campaignState,
+      adminDetails: {
+        ...sampleAdminDetails,
+      },
+    });
+  }, []);
+
+  // Steps
+  // Step 1 -> Admin Details
+  // Step 2 -> Basic Details
+  // Step 3 -> Rewards Details
+  // Step 4 -> Story Details
+  // Step 5 -> Story Details
+
+  const handleAdminChange = (key: string, value: string) => {
+    setCampaignState({
+      ...campaignState,
+      adminDetails: {
+        ...campaignState.adminDetails,
+        [key]: value,
+      },
+    });
+  };
+
+  const handleBasicChange = (key: string, value: string) => {
+    setCampaignState({
+      ...campaignState,
+      basic: {
+        ...campaignState.basic,
+        [key]: value,
+      },
+    });
+  };
+
+  const resolveFormStep = (step: number) => {
+    switch (step) {
+      case 1:
+        return (
+          <Step1
+            adminDetails={campaignState.adminDetails}
+            setAdminDetails={handleAdminChange}
+          />
+        );
+      case 2:
+        return (
+          <Step2
+            basicDetails={campaignState.basic}
+            setBasicDetails={handleBasicChange}
+          />
+        );
+      case 3:
+        return <Form3 />;
+    }
+  };
+
   return (
     <>
       <Box
@@ -305,7 +292,7 @@ const Multistep = () => {
           mx="5%"
           isAnimated
         ></Progress>
-        {step === 1 ? <Form1 /> : step === 2 ? <Form2 /> : <Form3 />}
+        {resolveFormStep(step)}
         <ButtonGroup mt="5%" w="100%">
           <Flex w="100%" justifyContent="space-between">
             <Flex>
@@ -324,13 +311,13 @@ const Multistep = () => {
               </Button>
               <Button
                 w="7rem"
-                isDisabled={step === 3}
+                isDisabled={step === 5}
                 onClick={() => {
                   setStep(step + 1);
-                  if (step === 3) {
+                  if (step === 5) {
                     setProgress(100);
                   } else {
-                    setProgress(progress + 33.33);
+                    setProgress(progress + 20.00);
                   }
                 }}
                 colorScheme="teal"
@@ -339,7 +326,7 @@ const Multistep = () => {
                 Next
               </Button>
             </Flex>
-            {step === 3 ? (
+            {step === 5 ? (
               <Button
                 w="7rem"
                 colorScheme="red"
@@ -365,11 +352,30 @@ const Multistep = () => {
 };
 
 const New = () => {
+  const router = useRouter();
+  const handleBack = () => {
+    router.push("/crowdfunding");
+  };
+
   return (
     <Box w="100%" p={4} background={"none"}>
-        <br />
       <br />
-      <Heading textAlign={"center"}>Create a new Campaign</Heading>
+      <BackButton onClick={handleBack} />
+      <br />
+      <Heading textAlign={"center"}>Create a new Crowdfunding Campaign</Heading>
+      <Heading
+        textAlign={"center"}
+        size={"sm"}
+        color={"blue.700"}
+        my={4}
+        fontWeight={"normal"}
+      >
+        Fill out the form below to help us help you in your `cause`.
+      </Heading>
+      <Text textAlign={"center"} color={"blue.500"}>
+        It's totally free and autonomous, we don't take any charges on
+        crowdfunding services.
+      </Text>
       <Multistep />
     </Box>
   );

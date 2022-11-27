@@ -4,17 +4,15 @@ import getLibrary from "../getLibrary";
 import { Box, ChakraProvider, Flex, HStack } from "@chakra-ui/react";
 
 import theme from "../theme";
-import Navbar from "../components/Navbar";
 import SideNavbar from "../components/Sidebar";
 
 function NextWeb3App({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <Web3ReactProvider getLibrary={getLibrary}>
-        <Navbar />
         <Flex>
           <SideNavbar>
-            <a></a>
+            <div></div>
           </SideNavbar>
           <Box flexGrow={1}>
             <Component {...pageProps} />

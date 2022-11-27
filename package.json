@@ -28,6 +28,7 @@
     "next": "^13.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-dropzone": "^14.2.3",
     "react-icons": "^4.6.0",
     "react-jdenticon": "^1.0.0",
     "swr": "^1.2.0"
