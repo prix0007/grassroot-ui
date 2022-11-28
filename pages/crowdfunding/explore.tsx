@@ -8,7 +8,7 @@ import useCrowdfundingState from "../../hooks/useCrowdfundingState";
 
 const items = [1, 2, 3, 4, 5, 7];
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
 const Explore = () => {
   const router = useRouter();
