@@ -16,12 +16,22 @@ import {
   List,
   ListItem,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { MdLocalShipping } from "react-icons/md";
+import BackButton from "../../../components/BackButton";
 
 const Campaign = () => {
+  const router = useRouter();
+  const handleBack = () => {
+    router.push("/crowdfunding");
+  };
+
   return (
     <Container maxW={"7xl"}>
+      <br />
+      <BackButton onClick={handleBack} />
+      <br />
       <SimpleGrid
         columns={{ base: 1, lg: 2 }}
         spacing={{ base: 8, md: 10 }}
