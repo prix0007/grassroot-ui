@@ -1,3 +1,4 @@
+
 import { Box, Button } from "@chakra-ui/react";
 import { useWeb3React } from "@web3-react/core";
 import { UserRejectedRequestError } from "@web3-react/injected-connector";
@@ -6,7 +7,6 @@ import { GiFoxTail, GiWallet } from "react-icons/gi";
 import { injected } from "../connectors";
 import useENSName from "../hooks/useENSName";
 import useMetaMaskOnboarding from "../hooks/useMetaMaskOnboarding";
-import { formatEtherscanLink, shortenHex } from "../util";
 
 type AccountProps = {
   triedToEagerConnect: boolean;
@@ -31,6 +31,8 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
       stopOnboarding();
     }
   }, [active, error, stopOnboarding]);
+
+
 
   const ENSName = useENSName(account);
 
@@ -69,7 +71,6 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
             borderRadius={"full"}
             onClick={() => {
               setConnecting(true);
-
               activate(injected, undefined, true).catch((error) => {
                 // ignore the error if it's a user rejected request
                 if (error instanceof UserRejectedRequestError) {

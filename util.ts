@@ -1,5 +1,6 @@
 import type { BigNumberish } from "@ethersproject/bignumber";
 import { formatUnits } from "@ethersproject/units";
+import jwt from "jsonwebtoken";
 
 export function shortenHex(hex: string, length = 4) {
   return `${hex.substring(0, length + 2)}…${hex.substring(
@@ -40,3 +41,12 @@ export const parseBalance = (
   decimals = 18,
   decimalsToDisplay = 3
 ) => parseFloat(formatUnits(value, decimals)).toFixed(decimalsToDisplay);
+
+
+export const formatMessage = (nonce: string) => {
+  return `You are signing to login into Grassroot: ${nonce}`;
+}
+
+export const decodeToken = (token: string) => {
+  return jwt.decode(token);
+}

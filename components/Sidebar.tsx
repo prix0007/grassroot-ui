@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import {
   IconButton,
   Box,
@@ -22,6 +22,7 @@ import {
   Center,
   MenuDivider,
   MenuItem,
+  useToast,
 } from "@chakra-ui/react";
 import {
   FiHome,
@@ -43,13 +44,23 @@ import grassrootIcon from "../public/grassroot_full.png";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import ETHBalance from "./ETHBalance";
 import Account from "./Account";
-import { formatEtherscanLink, shortenHex } from "../util";
+import {
+  decodeToken,
+  formatEtherscanLink,
+  formatMessage,
+  shortenHex,
+} from "../util";
 import { useWeb3React } from "@web3-react/core";
 import useEagerConnect from "../hooks/useEagerConnect";
 import TokenBalance from "./TokenBalance";
 import BuyToken from "./BuyToken";
 import useCrowdfundingContract from "../hooks/useCrowdfundingContract";
 import AllowanceToken from "./AllowanceToken";
+import { useMutation } from "@apollo/client";
+import { CREATE_NONCE, CREATE_USER } from "../graphql/mutations";
+import { ethers } from "ethers";
+import useLocalStorage from "../hooks/useLocalStorage";
+import { ACCESS_TOKEN_KEYS } from "../localStorageKeys";
 
 const USDC_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS;
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
@@ -107,9 +118,12 @@ interface SidebarProps extends BoxProps {
 }
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const toast = useToast();
   const { colorMode, toggleColorMode } = useColorMode();
 
-  const { account, library, chainId, deactivate } = useWeb3React();
+  const { account, library, chainId, deactivate, connector } = useWeb3React();
+
+  const [tokens, setToken] = useLocalStorage(ACCESS_TOKEN_KEYS, "");
 
   const triedToEagerConnect = useEagerConnect();
 
@@ -118,6 +132,110 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   // const crowdfundingContract = useCrowdfundingContract(
   //   CROWDFUNDING_CONTRACT_ADDRESS
   // );
+
+  const [createNonce, { data, error: errorGql, reset, loading }] =
+    useMutation(CREATE_NONCE);
+
+  const [
+    createUser,
+    { data: user, error: errorUser, reset: resetUser, loading: userLoading },
+  ] = useMutation(CREATE_USER);
+
+  useEffect(() => {
+    const shouldCreate = isConnected && (!tokens || !tokens[account]);
+
+    if (tokens && tokens[account]) {
+      const decodedToken = decodeToken(tokens[account].accessToken);
+      const currentTimeStamp = parseInt((Date.now() / 1000).toString());
+      if (decodedToken?.exp > currentTimeStamp) {
+        createNonce({
+          variables: {
+            address: account,
+          },
+        });
+      }
+    }
+
+    if (shouldCreate) {
+      createNonce({
+        variables: {
+          address: account,
+        },
+      });
+    }
+  }, [isConnected, account]);
+
+  const [isSigning, setSigning] = useState(false);
+
+  const handleMessage = async (nonce: string) => {
+    if (isConnected && !isSigning) {
+      const signer = library.getSigner();
+      const message = formatMessage(nonce);
+
+      try {
+        const signature = await signer?.signMessage(message);
+        // Post Signature to Create a New User here.
+        createUser({
+          variables: {
+            signature: signature,
+            address: account,
+            firstName: "",
+            lastName: "",
+            email: "",
+          },
+        });
+      } catch (e) {
+        toast({
+          title: "Seomthing Went Wrong!!",
+          colorScheme: "red",
+          status: "error",
+          description: "Try loggin in Again.",
+          isClosable: true,
+        });
+        console.log(e);
+      }
+      setSigning(false);
+    }
+  };
+
+  useEffect(() => {
+    const generatedUserTokens = user?.signup;
+    if (generatedUserTokens) {
+      setToken({
+        ...tokens,
+        [account]: generatedUserTokens,
+      });
+    }
+
+    if (errorUser) {
+      console.log(errorUser);
+      toast({
+        title: "Failed to Create User!!",
+        colorScheme: "red",
+        status: "error",
+        description: errorUser.message,
+        isClosable: true,
+      });
+    }
+  }, [user, userLoading, errorUser]);
+
+  useEffect(() => {
+    const generatedNonce = data?.generateNonce;
+    if (generatedNonce) {
+      console.log(generatedNonce.nonce);
+      handleMessage(generatedNonce.nonce);
+      setSigning(true);
+    }
+
+    if (errorGql) {
+      toast({
+        title: "Failed to Generate Nonce.",
+        colorScheme: "red",
+        description: errorGql.message,
+        isClosable: true,
+      });
+    }
+  }, [data, loading, errorGql]);
 
   return (
     <Box w={{ base: "full", md: 60 }} pos="fixed" h="full" {...rest}>

@@ -1,7 +1,6 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Box,
-  chakra,
   Container,
   Stack,
   Text,
