@@ -10,9 +10,9 @@ export const CREATE_NONCE = gql`
   }
 `;
 
-export const CREATE_USER = gql`
-  mutation Signup($address: String!, $signature: String!) {
-    signup(data: {
+export const CREATE_USER_OR_LOGIN = gql`
+  mutation SignupOrLogin($address: String!, $signature: String!) {
+    signupOrLogin(data: {
       address: $address,
       signature: $signature
     }) {

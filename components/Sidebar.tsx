@@ -57,7 +57,7 @@ import BuyToken from "./BuyToken";
 import useCrowdfundingContract from "../hooks/useCrowdfundingContract";
 import AllowanceToken from "./AllowanceToken";
 import { useMutation } from "@apollo/client";
-import { CREATE_NONCE, CREATE_USER } from "../graphql/mutations";
+import { CREATE_NONCE, CREATE_USER_OR_LOGIN } from "../graphql/mutations";
 import { ethers } from "ethers";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { ACCESS_TOKEN_KEYS } from "../localStorageKeys";
@@ -139,9 +139,10 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   const [
     createUser,
     { data: user, error: errorUser, reset: resetUser, loading: userLoading },
-  ] = useMutation(CREATE_USER);
+  ] = useMutation(CREATE_USER_OR_LOGIN);
 
   useEffect(() => {
+
     const shouldCreate = isConnected && (!tokens || !tokens[account]);
 
     if (tokens && tokens[account]) {
@@ -174,6 +175,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 
       try {
         const signature = await signer?.signMessage(message);
+        console.log(signature);
         // Post Signature to Create a New User here.
         createUser({
           variables: {
@@ -186,7 +188,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         });
       } catch (e) {
         toast({
-          title: "Seomthing Went Wrong!!",
+          title: "Something Went Wrong!!",
           colorScheme: "red",
           status: "error",
           description: "Try loggin in Again.",
@@ -199,7 +201,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   };
 
   useEffect(() => {
-    const generatedUserTokens = user?.signup;
+    const generatedUserTokens = user?.signupOrLogin;
     if (generatedUserTokens) {
       setToken({
         ...tokens,
