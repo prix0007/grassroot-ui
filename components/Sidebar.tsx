@@ -142,13 +142,13 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   ] = useMutation(CREATE_USER_OR_LOGIN);
 
   useEffect(() => {
-
     const shouldCreate = isConnected && (!tokens || !tokens[account]);
 
     if (tokens && tokens[account]) {
+      console.log( tokens[account])
       const decodedToken = decodeToken(tokens[account].accessToken);
       const currentTimeStamp = parseInt((Date.now() / 1000).toString());
-      if (decodedToken?.exp > currentTimeStamp) {
+      if (decodedToken?.exp < currentTimeStamp) {
         createNonce({
           variables: {
             address: account,
@@ -158,11 +158,13 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
     }
 
     if (shouldCreate) {
-      createNonce({
-        variables: {
-          address: account,
-        },
-      });
+      if (!localStorage.getItem(ACCESS_TOKEN_KEYS)) {
+        createNonce({
+          variables: {
+            address: account,
+          },
+        });
+      }
     }
   }, [isConnected, account]);
 
@@ -317,11 +319,11 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           </Link>
         </Box>
       </Box>
-      {LinkItems.map((link) => (
+      {/* {LinkItems.map((link) => (
         <NavItem key={link.name} icon={link.icon}>
           <Link href={link.href}>{link.name}</Link>
         </NavItem>
-      ))}
+      ))} */}
       <TokenBalance symbol="USDC" tokenAddress={USDC_TOKEN_ADDRESS} />
       <br />
       <BuyToken tokenAddress={USDC_TOKEN_ADDRESS} />
