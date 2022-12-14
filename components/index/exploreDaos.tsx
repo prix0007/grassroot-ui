@@ -1,5 +1,15 @@
-import { Box, Heading, SimpleGrid, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  CircularProgress,
+  Heading,
+  SimpleGrid,
+  Stack,
+} from "@chakra-ui/react";
+import { useQueries, useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import React from "react";
+import useDAOSContract from "../../hooks/useDAOContract";
+import { useDaosQueries } from "../../hooks/useDataFetching";
 import DAOCard from "../DaoCard";
 
 const ExploreDaos = () => {
@@ -26,6 +36,8 @@ const ExploreDaos = () => {
     },
   ];
 
+  const daosQueries = useDaosQueries();
+
   return (
     <Stack
       align={"center"}
@@ -35,17 +47,29 @@ const ExploreDaos = () => {
     >
       <Heading>Explore DAOs</Heading>
       <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px">
-        {daos.map((dao, index) => {
-          return (
-            <DAOCard
-              key={index}
-              name={dao.name}
-              author={dao.author}
-              members={dao.members}
-              image={dao.image}
-              href={`/dao/${index + 1}`}
-            />
-          );
+        {daosQueries.map((dao, index) => {
+          if (dao.isLoading) {
+            return (
+              <CircularProgress
+                isIndeterminate
+                color={"brand.700"}
+                key={index}
+              />
+            );
+          }
+          if (dao.isFetched && !dao.isError) {
+            const daoData = dao.data;
+            return (
+              <DAOCard
+                key={daoData?.daoId || index}
+                name={daoData?.name}
+                author={daoData?.metadata?.adminAddress}
+                members={[]}
+                image={daoData?.metadata?.profilePicture}
+                href={`/dao/${daoData?.daoId}`}
+              />
+            );
+          }
         })}
       </SimpleGrid>
     </Stack>

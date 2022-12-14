@@ -17,6 +17,7 @@ import NextLink from "next/link";
 // Assets
 import React, { useState } from "react";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
+import { shortenHex } from "../util";
 
 type DAOCardProps = {
   image: string;
@@ -32,41 +33,41 @@ export default function DAOCard(props: DAOCardProps) {
   const textColor = useColorModeValue("navy.700", "white");
   const textColorBid = useColorModeValue("brand.700", "white");
   return (
-    <NextLink href={href}>
-      <Card p="20px" >
-        <Flex direction={{ base: "column" }} justify="center">
-          <Box mb={{ base: "20px", "2xl": "20px" }} position="relative">
-            <Image
-              src={image}
-              w={{ base: "100%", "3xl": "100%" }}
-              h={{ base: "100%", "3xl": "100%" }}
-              borderRadius="20px"
+    <Card p="20px">
+      <Flex direction={{ base: "column" }} justify="center">
+        <Box mb={{ base: "20px", "2xl": "20px" }} position="relative">
+          <Image
+            src={image}
+            w={{ base: "100%", "3xl": "100%" }}
+            h={{ base: "100%", "3xl": "100%" }}
+            borderRadius="20px"
+          />
+          <Button
+            position="absolute"
+            bg="white"
+            _hover={{ bg: "whiteAlpha.900" }}
+            _active={{ bg: "white" }}
+            _focus={{ bg: "white" }}
+            p="0px !important"
+            top="14px"
+            right="14px"
+            borderRadius="50%"
+            minW="36px"
+            h="36px"
+            onClick={() => {
+              setLike(!like);
+            }}
+          >
+            <Icon
+              transition="0.2s linear"
+              w="20px"
+              h="20px"
+              as={like ? IoHeart : IoHeartOutline}
+              color="brand.700"
             />
-            <Button
-              position="absolute"
-              bg="white"
-              _hover={{ bg: "whiteAlpha.900" }}
-              _active={{ bg: "white" }}
-              _focus={{ bg: "white" }}
-              p="0px !important"
-              top="14px"
-              right="14px"
-              borderRadius="50%"
-              minW="36px"
-              h="36px"
-              onClick={() => {
-                setLike(!like);
-              }}
-            >
-              <Icon
-                transition="0.2s linear"
-                w="20px"
-                h="20px"
-                as={like ? IoHeart : IoHeartOutline}
-                color="brand.700"
-              />
-            </Button>
-          </Box>
+          </Button>
+        </Box>
+        <NextLink href={href}>
           <Flex flexDirection="column" justify="space-between" h="100%">
             <Flex
               justify="space-between"
@@ -114,7 +115,7 @@ export default function DAOCard(props: DAOCardProps) {
                   fontWeight="400"
                   me="14px"
                 >
-                  {author}
+                  {author && shortenHex(author, 8)}
                 </Text>
               </Flex>
               <AvatarGroup
@@ -136,8 +137,8 @@ export default function DAOCard(props: DAOCardProps) {
               </AvatarGroup>
             </Flex>
           </Flex>
-        </Flex>
-      </Card>
-    </NextLink>
+        </NextLink>
+      </Flex>
+    </Card>
   );
 }
