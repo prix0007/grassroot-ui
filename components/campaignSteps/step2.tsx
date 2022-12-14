@@ -42,7 +42,7 @@ type IForm2 = {
 // - Completion Date
 
 export const CATEGORIES = ["electronics", "arts", "social", "buisness", "product"];
-const SUBCATEGORIES = {
+export const SUBCATEGORIES = {
   electronics: ["personal", "gadget", "phone", "others"],
   arts: ["digital collection", "museum", "charity art", "NFTs", "others"],
   social: ["charity", "social cause", "others"],
@@ -50,7 +50,7 @@ const SUBCATEGORIES = {
   product: ["baby care", "strope", "software", "hardware", "others"],
 };
 
-const COUNTRIES = ["India", "United Kingdom", "United States of America"];
+export const COUNTRIES = ["India", "United Kingdom", "United States of America"];
 
 const ACCEPTED_TOKENS = [
   {

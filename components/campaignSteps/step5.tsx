@@ -119,16 +119,6 @@ type IStep5 = {
 };
 
 const Step5: React.FC<IStep5> = ({ socials, setSocial }) => {
-  const toast = useToast();
-  const handleClick = () => {
-    toast({
-      title: "Updated",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-  };
-
   return (
     <Box>
       <Flex
