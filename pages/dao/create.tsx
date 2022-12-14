@@ -277,9 +277,9 @@ const Form2: React.FC<Form2> = ({
             </Select>
           </FormControl>
           <Box my={2}>
-            {state.categories.map((category) => {
+            {state.categories.map((category, idx) => {
               return (
-                <Tag mx={2} my={1} backgroundColor={"brand.700"}>
+                <Tag mx={2} my={1} backgroundColor={"brand.700"} key={category+idx}>
                   {category}
                 </Tag>
               );
@@ -326,9 +326,9 @@ const Form2: React.FC<Form2> = ({
             </Select>
           </FormControl>
           <Box my={2}>
-            {state.subCategories.map((subcategory) => {
+            {state.subCategories.map((subcategory, idx) => {
               return (
-                <Tag mx={2} my={1} backgroundColor={"brand.700"}>
+                <Tag mx={2} my={1} backgroundColor={"brand.700"} key={subcategory+idx}>
                   {subcategory}
                 </Tag>
               );
