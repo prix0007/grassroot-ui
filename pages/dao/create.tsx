@@ -41,6 +41,8 @@ import axios from "axios";
 import { useDropzone } from "react-dropzone";
 import useDAOSContract from "../../hooks/useDAOContract";
 import { DAOS } from "../../contracts/types";
+import { makeGraphQLInstance } from "../../graphql";
+import { postDao, POSTDAOProps } from "../../hooks/daos/useDAOs";
 
 export type CreateDAOPropsBC = {
   name: string;
@@ -279,7 +281,12 @@ const Form2: React.FC<Form2> = ({
           <Box my={2}>
             {state.categories.map((category, idx) => {
               return (
-                <Tag mx={2} my={1} backgroundColor={"brand.700"} key={category+idx}>
+                <Tag
+                  mx={2}
+                  my={1}
+                  backgroundColor={"brand.700"}
+                  key={category + idx}
+                >
                   {category}
                 </Tag>
               );
@@ -328,7 +335,12 @@ const Form2: React.FC<Form2> = ({
           <Box my={2}>
             {state.subCategories.map((subcategory, idx) => {
               return (
-                <Tag mx={2} my={1} backgroundColor={"brand.700"} key={subcategory+idx}>
+                <Tag
+                  mx={2}
+                  my={1}
+                  backgroundColor={"brand.700"}
+                  key={subcategory + idx}
+                >
                   {subcategory}
                 </Tag>
               );
@@ -438,7 +450,6 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
   const handleAddTag = () => {
     if (tagRef && tagRef.current) {
       const ipTag = tagRef?.current.value as string;
-      console.log(ipTag);
       const newTags = [...formState?.tags, ipTag];
       setFormState({ ...formState, tags: newTags });
       tagRef.current.value = "";
@@ -587,7 +598,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
       const {
         data: { metadataUrl, metadataCid },
       } = fileRepsonse;
-      console.log("URLS: ", metadataUrl, metadataCid);
+
       toast({
         title: "Uploaded Metadata",
         description: `Metadata Uploaded.`,
@@ -602,6 +613,20 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
           metadataUrl
         );
         const txReceipt = await tx.wait();
+        const variables: POSTDAOProps = {
+          name: formState?.name,
+          description: formState?.description,
+          backgroundPicture: formState?.backgroundPicture || "",
+          profilePicture: formState?.profilePicture,
+          metadata: {
+            daoData: formState,
+            ipfsMetadata: fileRepsonse,
+            transactionData: txReceipt,
+          },
+        };
+
+        daoCreate.mutate(variables);
+
         toast({
           title: "Created DAO Successfully",
           description: `DAO is created on transaction ${txReceipt.transactionHash}.`,
@@ -621,6 +646,10 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
       }
     },
   });
+
+  // Login Client to the Backend
+  const client = makeGraphQLInstance(queryLoc?.data?.accessToken);
+  const daoCreate = postDao(client);
 
   const handleSubmit = async () => {
     // Handle Final Validations.
