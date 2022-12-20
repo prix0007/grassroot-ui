@@ -7,7 +7,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useMemo } from "react";
 import { makeGraphQLInstance } from "../../graphql";
-import { useDaosQueries } from "../../hooks/daos/useDAOs";
+import { useDaosQueries } from "../../hooks/daos";
 import DAOCard from "../DaoCard";
 
 const ExploreDaos = () => {

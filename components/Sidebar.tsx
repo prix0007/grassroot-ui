@@ -133,12 +133,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   //   CROWDFUNDING_CONTRACT_ADDRESS
   // );
 
-  const [createNonce, { data, error: errorGql, reset, loading }] =
+  const [createNonce, { data, error: errorGql, loading }] =
     useMutation(CREATE_NONCE);
 
   const [
     createUser,
-    { data: user, error: errorUser, reset: resetUser, loading: userLoading },
+    { data: user, error: errorUser, loading: userLoading },
   ] = useMutation(CREATE_USER_OR_LOGIN);
 
   useEffect(() => {
@@ -212,7 +212,6 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
     }
 
     if (errorUser) {
-      console.log(errorUser);
       toast({
         title: "Failed to Create User!!",
         colorScheme: "red",
@@ -226,7 +225,6 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   useEffect(() => {
     const generatedNonce = data?.generateNonce;
     if (generatedNonce) {
-      console.log(generatedNonce.nonce);
       handleMessage(generatedNonce.nonce);
       setSigning(true);
     }

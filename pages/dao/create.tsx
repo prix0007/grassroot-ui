@@ -42,7 +42,7 @@ import { useDropzone } from "react-dropzone";
 import useDAOSContract from "../../hooks/useDAOContract";
 import { DAOS } from "../../contracts/types";
 import { makeGraphQLInstance } from "../../graphql";
-import { postDao, POSTDAOProps } from "../../hooks/daos/useDAOs";
+import { postDao, POSTDAOProps } from "../../hooks/daos";
 
 export type CreateDAOPropsBC = {
   name: string;

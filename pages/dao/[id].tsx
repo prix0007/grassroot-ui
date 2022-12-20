@@ -7,79 +7,76 @@ import {
   Text,
   Image,
   CircularProgress,
+  SimpleGrid,
+  Box,
+  Heading,
+  Grid,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
-import { useDaoQuery } from "../../hooks/useDataFetching";
+import DaoTabs from "../../components/dao/daoTabs";
+import { makeGraphQLInstance } from "../../graphql";
+import { useDaoQuery } from "../../hooks/daos";
 
 const DAO = () => {
   const {
     query: { id },
   } = useRouter();
 
-  const daoQuery = useDaoQuery(parseInt(id as string));
+  const client = makeGraphQLInstance("");
 
-  console.log(daoQuery);
+  const { isLoading, isError, isFetched, data } = useDaoQuery(client, {
+    id: id as string,
+  });
+
+  console.log(data?.daoById);
 
   const fontSize = useBreakpointValue({ base: "3xl", md: "4xl" });
 
   return (
-    <Stack
-      w={"full"}
-      py={"xl"}
-      minHeight={"50vh"}
-      bgGradient={"linear(to-r, blackAlpha.600, transparent)"}
-    >
-      {daoQuery.isLoading && (
-        <CircularProgress isIndeterminate color={"brand.700"} />
-      )}
-      {daoQuery.isFetched && !daoQuery.isError ? (
-        <VStack w={"full"} mt={"10vh"} height={"100%"} justify={"center"}>
-          <Image
-            src={new URL(daoQuery?.data?.metadata?.profilePicture).toString()}
-            alt={daoQuery?.data?.name}
-          />
-          <Stack maxW={"2xl"} align={"flex-start"} spacing={6}>
-            <Text
-              color={"white"}
+    <VStack w={"full"} p={"10px"}>
+      {isLoading && <CircularProgress isIndeterminate color={"brand.700"} />}
+      {isError && <Text>Some error occured while fetching!!</Text>}
+      {isFetched && !isError && (
+        <Flex flexDirection={{ base: "column", md: "row" }}>
+          <Stack
+            minW={"350px"}
+            height={"100%"}
+            align={"flex-end"}
+            justifyContent={"center"}
+            spacing={6}
+            padding={"20px"}
+          >
+            <Heading
+              color={"brand.700"}
               fontWeight={700}
               lineHeight={1.2}
-              fontSize={fontSize}
+              mt={"20px"}
             >
-              {daoQuery?.data?.name}
-            </Text>
+              {data?.daoById?.name}
+            </Heading>
             <Text
               color={"white"}
               fontWeight={500}
               lineHeight={1}
               fontSize={"md"}
             >
-              {daoQuery?.data?.description}
+              {data?.daoById?.description}
             </Text>
-            <Stack direction={"row"}>
-              <Button
-                bg={"blue.400"}
-                rounded={"full"}
-                color={"white"}
-                _hover={{ bg: "blue.500" }}
-              >
-                Show me more
-              </Button>
-              <Button
-                bg={"whiteAlpha.300"}
-                rounded={"full"}
-                color={"white"}
-                _hover={{ bg: "whiteAlpha.500" }}
-              >
-                Show me more
-              </Button>
-            </Stack>
+            <Text wordBreak={"break-all"}>
+              Administered By: {data?.daoById?.adminAddress}
+            </Text>
           </Stack>
-        </VStack>
-      ) : (
-        <Text>Something went wrong...</Text>
+          <Box>
+            <Image
+              src={new URL(data?.daoById?.profilePicture).toString()}
+              alt={data?.daoById?.name}
+            />
+          </Box>
+        </Flex>
       )}
-    </Stack>
+      <DaoTabs />
+    </VStack>
   );
 };
 
