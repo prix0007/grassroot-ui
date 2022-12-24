@@ -120,7 +120,7 @@ const AboutTabPanel: React.FC<AboutProps> = ({
       <Box w={"100%"} my={"10px"}>
         {metadata?.tags?.map((value: string, index: number) => {
           return (
-            <Tag id={value + index} m={"2px"} colorScheme={"green"}>
+            <Tag id={value + index} key={`tag-${value}-${index}`} m={"2px"} colorScheme={"green"}>
               #{value}
             </Tag>
           );
