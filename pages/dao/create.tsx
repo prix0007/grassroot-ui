@@ -43,6 +43,7 @@ import useDAOSContract from "../../hooks/useDAOContract";
 import { DAOS } from "../../contracts/types";
 import { makeGraphQLInstance } from "../../graphql";
 import { postDao, POSTDAOProps } from "../../hooks/daos";
+import ImageDropper from "../../components/ImageDropper";
 
 export type CreateDAOPropsBC = {
   name: string;
@@ -150,96 +151,23 @@ const Form2: React.FC<Form2> = ({
   handleImageSet,
   tokens,
 }) => {
-  const toast = useToast();
-
-  const onDrop = useCallback((acceptedFiles) => {
-    // Do something with the files
-    const imgUrls = acceptedFiles.map((file: File) => {
-      console.log(file);
-      mutation.mutate(file);
-      handleImageSet("profilePicture", URL.createObjectURL(file));
-      return URL.createObjectURL(file);
-    });
-  }, []);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-
-  const mutation = useMutation({
-    mutationFn: (file: File) => {
-      const form = new FormData();
-      form.append("file", file);
-      console.log(tokens);
-      return axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/files/uploadImage`,
-        form,
-        {
-          headers: {
-            Authorization: `Bearer ${tokens.accessToken}`,
-          },
-        }
-      );
-    },
-    onError: () => {
-      toast({
-        title: "Error on Uploading!!",
-        description: `Failed to Upload Image.`,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    },
-    onSuccess: (fileRepsonse) => {
-      const {
-        data: { imageUrl },
-      } = fileRepsonse;
-      handleImageSet("profilePicture", imageUrl);
-      toast({
-        title: "Uploaded Image",
-        description: `Image Uploaded.`,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    },
-  });
-
   return (
     <Stack width={"xl"}>
       <Heading w="100%" textAlign={"center"} fontWeight="normal" mb="2%">
         DAO Details
       </Heading>
-      <Box w={"100%"}>
-        {state.profilePicture && <Image src={state.profilePicture} />}
-        <Box
-          {...getRootProps()}
-          display={"flex"}
-          justifyContent={"center"}
-          alignItems={"center"}
-          w={"100%"}
-          mt={2}
-          minHeight={"5rem"}
-          borderWidth={"3px"}
-          borderColor={"blue.600"}
-          borderRadius={"md"}
-          borderStyle={"dashed"}
-        >
-          {mutation.isLoading ? (
-            <CircularProgress isIndeterminate color={"brand.700"} />
-          ) : (
-            <>
-              <input {...getInputProps()} />
-              {isDragActive ? (
-                <Text>Drop the files here ...</Text>
-              ) : (
-                <Text color="blue.600">
-                  Drag &apos;n&apos; drop some files here, or click to select
-                  files
-                </Text>
-              )}
-            </>
-          )}
-        </Box>
-      </Box>
+      <ImageDropper
+        handleFileUploaded={handleImageSet}
+        propKey={"profilePicture"}
+        heading={"Profile Picture"}
+        token={tokens?.accessToken}
+      />
+      <ImageDropper
+        handleFileUploaded={handleImageSet}
+        propKey={"backgroundPicture"}
+        heading={"Background Picture"}
+        token={tokens?.accessToken}
+      />
       <Flex justifyContent={"space-between"} my={2} direction={"row"}>
         <Box w={"50%"} pr={2}>
           <FormControl as={GridItem} colSpan={[6, 3]}>
@@ -396,21 +324,32 @@ const Form2: React.FC<Form2> = ({
               key={tag + idx}
               borderRadius="full"
               variant="solid"
-              colorScheme="blue"
+              colorScheme="green"
               my={2}
               mx={1}
             >
-              <TagLabel>{tag}</TagLabel>
+              <TagLabel>#{tag}</TagLabel>
               <TagCloseButton onClick={() => handleTagRemove(idx)} />
             </Tag>
           );
         })}
-        <InputGroup size="md">
+        <InputGroup
+          size="md"
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
           <Input
             pr="4.5rem"
             type={"text"}
             placeholder="Type to add a new tag."
             ref={tagRef}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleTagAdd();
+                e.preventDefault();
+              }
+            }}
           />
           <InputRightElement width="7.5rem">
             <Button
@@ -434,7 +373,9 @@ interface IDAOForm {
 
 const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
   const toast = useToast();
+
   const [step, setStep] = useState(1);
+
   const [progress, setProgress] = useState(50.0);
 
   const { account, library } = useWeb3React();
@@ -552,10 +493,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
     },
     refetchInterval: 3000,
     cacheTime: 3000,
-  });
-
-  useEffect(() => {
-    if (queryLoc.isError && !queryLoc.isLoading) {
+    onError: (error) => {
       toast({
         title: "Please Login.",
         description: "You need to be logged in to create a DAO.",
@@ -564,8 +502,8 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
         isClosable: true,
       });
       Router.push("/");
-    }
-  }, [queryLoc]);
+    },
+  });
 
   const fileMutation = useMutation({
     mutationFn: (metadata: any) => {

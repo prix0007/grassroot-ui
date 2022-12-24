@@ -42,11 +42,47 @@ export const parseBalance = (
   decimalsToDisplay = 3
 ) => parseFloat(formatUnits(value, decimals)).toFixed(decimalsToDisplay);
 
-
 export const formatMessage = (nonce: string) => {
   return `You are signing to login into Grassroot: ${nonce}`;
-}
+};
 
 export const decodeToken = (token: string) => {
   return jwt.decode(token);
+};
+
+export enum Type {
+  "transaction",
+  "address",
 }
+
+export interface Links {
+  url: string;
+}
+
+const explorerPrefixes = {
+  maticmum: "mumbai.polygonscan.com",
+};
+
+const typeToLink = (type: Type, prefix: string, link: string) => {
+  switch (type) {
+    case Type.transaction:
+      return `https://${prefix}/tx/${link}`;
+    case Type.address:
+      return `https://${prefix}/address/${link}`;
+    default:
+      return `https://${prefix}/${link}`;
+  }
+};
+
+export const resolveBlockchainLinks = (
+  network: string,
+  type: Type,
+  link: string
+): Links => {
+  switch (network) {
+    case "maticmum":
+      return { url: typeToLink(type, explorerPrefixes["maticmum"], link) };
+    default:
+      return { url: typeToLink(type, explorerPrefixes["maticmum"], link) };
+  }
+};

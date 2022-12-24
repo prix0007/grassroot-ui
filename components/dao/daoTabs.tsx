@@ -9,7 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React from "react";
-import AboutTabPanel from "./tabs/aboutTab";
+import AboutTabPanel, { AboutProps } from "./tabs/aboutTab";
 import CommunicationTabPanel from "./tabs/communicationTab";
 import ResourcesTabPanel from "./tabs/resourcesTab";
 import TreasuryTabPanel from "./tabs/treasuryTab";
@@ -17,50 +17,77 @@ import TreasuryTabPanel from "./tabs/treasuryTab";
 const tabsJson = [
   {
     name: "About",
-    panel: (
+    panel: (props) => (
       <TabPanel key="about">
-        <AboutTabPanel />
+        <AboutTabPanel {...props} key={"aboutTabPanel"} />
       </TabPanel>
     ),
   },
   {
     name: "Resources",
-    panel: (
+    panel: (props) => (
       <TabPanel key="resources">
-        <ResourcesTabPanel />
+        <ResourcesTabPanel {...props} key={"resourceTabPanel"} />
       </TabPanel>
     ),
   },
   {
     name: "Treasury",
-    panel: (
+    panel: (props) => (
       <TabPanel key="treasury">
-        <TreasuryTabPanel />
+        <TreasuryTabPanel {...props} key={"treasuryTabPanel"} />
       </TabPanel>
     ),
   },
   {
     name: "Communications",
-    panel: (
+    panel: (props) => (
       <TabPanel key="communcation">
-        <CommunicationTabPanel />
+        <CommunicationTabPanel {...props} key={"communicationsTabPanel"} />
       </TabPanel>
     ),
   },
 ];
 
-const DaoTabs = () => {
+interface DaoTabsProps {
+  aboutProps: AboutProps;
+  resourceProps: any;
+  treasuryProps: any;
+  communicationProps: any;
+}
+
+const DaoTabs: React.FC<DaoTabsProps> = ({
+  aboutProps,
+  resourceProps,
+  treasuryProps,
+  communicationProps,
+}) => {
+  const resolveTabToProps = (tabName: string) => {
+    switch (tabName) {
+      case "About":
+        return aboutProps;
+      case "Resources":
+        return resourceProps;
+      case "Treasury":
+        return treasuryProps;
+      case "Communication":
+        return communicationProps;
+      default:
+        return {};
+    }
+  };
+
   return (
     <Box width={"100%"}>
       <Tabs isFitted variant="soft-rounded" colorScheme={"blue"}>
-        <TabList mb="1em">
+        <TabList mb="1em" flexWrap={"wrap"}>
           {tabsJson.map((tab, index) => {
             return <Tab key={tab.name + index}>{tab.name}</Tab>;
           })}
         </TabList>
         <TabPanels>
           {tabsJson.map((tabpanel, index) => {
-            return tabpanel.panel;
+            return tabpanel.panel(resolveTabToProps(tabpanel.name));
           })}
         </TabPanels>
       </Tabs>

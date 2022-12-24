@@ -8,16 +8,15 @@ import {
   ApolloProvider,
   gql,
 } from "@apollo/client";
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import theme from "../theme";
 import SideNavbar from "../components/Sidebar";
 
 const client = new ApolloClient({
-  uri: process.env.NEXT_PUBLIC_BACKEND_URL + "/graphql" || "http://localhost:3000/graphql",
+  uri:
+    process.env.NEXT_PUBLIC_BACKEND_URL + "/graphql" ||
+    "http://localhost:3000/graphql",
   cache: new InMemoryCache(),
 });
 
@@ -29,13 +28,20 @@ function NextWeb3App({ Component, pageProps }: AppProps) {
       <ApolloProvider client={client}>
         <ChakraProvider theme={theme}>
           <Web3ReactProvider getLibrary={getLibrary}>
-            <Flex>
+            <Flex alignItems={"stretch"}>
               <SideNavbar>
                 <div></div>
               </SideNavbar>
-              <Box flexGrow={1}>
-                <Component {...pageProps} />
-              </Box>
+              <Flex
+                flexGrow={1}
+                flexDirection={"column"}
+                alignItems={"center"}
+                justifyContent={"flex-start"}
+              >
+                <Box width={"100%"} maxWidth={"1920px"}>
+                  <Component {...pageProps} />
+                </Box>
+              </Flex>
             </Flex>
           </Web3ReactProvider>
         </ChakraProvider>
