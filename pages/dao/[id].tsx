@@ -58,7 +58,7 @@ const DAO = () => {
               width={"100%"}
               overflow={"hidden"}
               backgroundImage={new URL(
-                data?.daoById?.backgroundPicture
+                data?.daoById?.backgroundPicture || data?.daoById?.profilePicture || ""
               ).toString()}
               backgroundRepeat={"no-repeat"}
               backgroundSize={"cover"}
