@@ -34,7 +34,10 @@ const DAO = () => {
   });
 
   const fontSize = useBreakpointValue({ base: "3xl", md: "4xl" });
-  const flexDir: StackDirection = useBreakpointValue({ base: "column", md: "row" });
+  const flexDir: StackDirection = useBreakpointValue({
+    base: "column",
+    md: "row",
+  });
 
   const { colorMode } = useColorMode();
 
@@ -58,7 +61,9 @@ const DAO = () => {
               width={"100%"}
               overflow={"hidden"}
               backgroundImage={new URL(
-                data?.daoById?.backgroundPicture || data?.daoById?.profilePicture || ""
+                data?.daoById?.backgroundPicture ||
+                  data?.daoById?.profilePicture ||
+                  ""
               ).toString()}
               backgroundRepeat={"no-repeat"}
               backgroundSize={"cover"}
@@ -125,7 +130,7 @@ const DAO = () => {
           }}
           communicationProps={{}}
           resourceProps={{}}
-          treasuryProps={{}}
+          treasuryProps={{ adminAddress: data?.daoById?.adminAddress }}
         />
       </Box>
     </VStack>

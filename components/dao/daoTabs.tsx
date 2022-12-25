@@ -12,7 +12,7 @@ import React from "react";
 import AboutTabPanel, { AboutProps } from "./tabs/aboutTab";
 import CommunicationTabPanel from "./tabs/communicationTab";
 import ResourcesTabPanel from "./tabs/resourcesTab";
-import TreasuryTabPanel from "./tabs/treasuryTab";
+import TreasuryTabPanel, { TreasuryTabPanelProps } from "./tabs/treasuryTab";
 
 const tabsJson = [
   {
@@ -52,7 +52,7 @@ const tabsJson = [
 interface DaoTabsProps {
   aboutProps: AboutProps;
   resourceProps: any;
-  treasuryProps: any;
+  treasuryProps: TreasuryTabPanelProps;
   communicationProps: any;
 }
 
