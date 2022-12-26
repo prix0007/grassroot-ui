@@ -14,8 +14,11 @@ import {
   Box,
   Text,
 } from "@chakra-ui/react";
+import { useWeb3React } from "@web3-react/core";
 import { useState } from "react";
 import { BsFillImageFill } from "react-icons/bs";
+import { makeGraphQLInstance } from "../../graphql";
+import { useTokensQuery, useUserQuery } from "../../hooks/user";
 import { IProfileDetails } from "../../pages/dao/[id]/campaign/new";
 
 type IForm1 = {

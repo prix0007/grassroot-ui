@@ -22,6 +22,10 @@ import { ICampaignBasicDetails } from "../../pages/dao/[id]/campaign/new";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import { CloseIcon } from "@chakra-ui/icons";
+import ImageDropper from "../ImageDropper";
+import ImageDropperMany from "../ImageDropperMany";
+import { useWeb3React } from "@web3-react/core";
+import { useTokensQuery } from "../../hooks/user";
 
 type IForm2 = {
   basicDetails: ICampaignBasicDetails;
@@ -41,7 +45,13 @@ type IForm2 = {
 // - Goal Amount
 // - Completion Date
 
-export const CATEGORIES = ["electronics", "arts", "social", "buisness", "product"];
+export const CATEGORIES = [
+  "electronics",
+  "arts",
+  "social",
+  "buisness",
+  "product",
+];
 export const SUBCATEGORIES = {
   electronics: ["personal", "gadget", "phone", "others"],
   arts: ["digital collection", "museum", "charity art", "NFTs", "others"],
@@ -50,7 +60,11 @@ export const SUBCATEGORIES = {
   product: ["baby care", "strope", "software", "hardware", "others"],
 };
 
-export const COUNTRIES = ["India", "United Kingdom", "United States of America"];
+export const COUNTRIES = [
+  "India",
+  "United Kingdom",
+  "United States of America",
+];
 
 const ACCEPTED_TOKENS = [
   {
@@ -142,6 +156,10 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
     const newTags = basicDetails?.tags.filter((tag, index) => index !== idx);
     setBasicDetails("tags", newTags);
   };
+
+  const { account } = useWeb3React();
+
+  const { data, isLoading, isError } = useTokensQuery(account);
 
   return (
     <>
@@ -360,62 +378,13 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
           })}
         </Select>
       </FormControl>
-
-      <Flex direction={"column"}>
-        <Heading size={"lg"} fontSize={"normal"}>
-          Images
-        </Heading>
-        <Flex flexWrap={"wrap"}>
-          {basicDetails?.images.map((imageUrl, idx) => {
-            return (
-              <Box m={2} key={imageUrl + idx} position={"relative"}>
-                <IconButton
-                  position={"absolute"}
-                  right={-2}
-                  top={-2}
-                  onClick={() => handleRemoveImage(idx)}
-                  aria-label={"remove image"}
-                  borderColor={"red.300"}
-                  borderWidth={"2px"}
-                  colorScheme={"red"}
-                  borderRadius={"50px"}
-                  size={"sm"}
-                >
-                  <CloseIcon color={"red.800"} />
-                </IconButton>
-                <Image
-                  src={imageUrl}
-                  alt={"selected image"}
-                  width={200}
-                  height={150}
-                />
-              </Box>
-            );
-          })}
-        </Flex>
-        <Box
-          {...getRootProps()}
-          display={"flex"}
-          justifyContent={"center"}
-          alignItems={"center"}
-          w={"100%"}
-          mt={2}
-          minHeight={"5rem"}
-          borderWidth={"3px"}
-          borderColor={"blue.600"}
-          borderRadius={"md"}
-          borderStyle={"dashed"}
-        >
-          <input {...getInputProps()} />
-          {isDragActive ? (
-            <Text>Drop the files here ...</Text>
-          ) : (
-            <Text color="blue.600">
-              Drag &apos;n&apos; drop some files here, or click to select files
-            </Text>
-          )}
-        </Box>
-      </Flex>
+      <ImageDropperMany
+        currentImages={basicDetails?.images}
+        handleFileUploaded={setBasicDetails}
+        propKey={"images"}
+        heading={"Campaign Images"}
+        token={data?.accessToken}
+      />
 
       <Box>
         <Text my={4}>Tags</Text>

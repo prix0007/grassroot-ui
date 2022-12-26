@@ -34,6 +34,9 @@ import Step4 from "../../../../components/campaignSteps/step4";
 import Step5 from "../../../../components/campaignSteps/step5";
 import { useWeb3React } from "@web3-react/core";
 import useCrowdfundingContract from "../../../../hooks/useCrowdfundingContract";
+import { useTokensQuery, useUserQuery } from "../../../../hooks/user";
+import { GraphQLClient } from "graphql-request";
+import { makeGraphQLInstance } from "../../../../graphql";
 
 const CROWDFUNDING_CONTRACT_ADDRESS =
   "0x6ddC3Bde48ADdE719dee30200587A484b5db2bd7";
@@ -169,7 +172,17 @@ const blankCampaign = {
   ],
 };
 
-const Multistep = () => {
+interface IPropsMultiStep {
+  user?: {
+    firstname: string;
+    lastname: string;
+    id: string;
+    role: string;
+    email: string;
+  };
+}
+
+const Multistep: React.FC<IPropsMultiStep> = ({ user }) => {
   const toast = useToast();
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(20.0);
@@ -192,6 +205,8 @@ const Multistep = () => {
       ...campaignState,
       adminDetails: {
         ...campaignState.adminDetails,
+        firstName: user?.firstname,
+        lastName: user?.lastname,
         address: account,
       },
     });
@@ -550,6 +565,20 @@ const New = () => {
     router.back();
   };
 
+  const { account } = useWeb3React();
+
+  const { data, isLoading, isError } = useTokensQuery(account);
+
+  useEffect(() => {
+    if (!isLoading && !isError && !data.accessToken || !account) {
+      router.back();
+    }
+  }, [data, account]);
+
+  const client = makeGraphQLInstance(data?.accessToken);
+
+  const { data: currentUser } = useUserQuery(client);
+
   return (
     <Box w="100%" p={4} background={"none"}>
       <br />
@@ -569,7 +598,7 @@ const New = () => {
         It&apos;s totally autonomous, we don&apos;t take any charges on extra
         services, only 2% if your goal is reached.
       </Text>
-      <Multistep />
+      <Multistep user={currentUser?.me} />
     </Box>
   );
 };
