@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import AboutTabPanel, { AboutProps } from "./tabs/aboutTab";
+import CampaignsTabPanel from "./tabs/campaignsTab";
 import CommunicationTabPanel from "./tabs/communicationTab";
 import ResourcesTabPanel from "./tabs/resourcesTab";
 import TreasuryTabPanel, { TreasuryTabPanelProps } from "./tabs/treasuryTab";
@@ -24,10 +25,10 @@ const tabsJson = [
     ),
   },
   {
-    name: "Resources",
+    name: "Campaigns",
     panel: (props) => (
-      <TabPanel key="resources">
-        <ResourcesTabPanel {...props} key={"resourceTabPanel"} />
+      <TabPanel key="campaigns">
+        <CampaignsTabPanel {...props} key={"campaignsTabPanel"} />
       </TabPanel>
     ),
   },
@@ -36,6 +37,14 @@ const tabsJson = [
     panel: (props) => (
       <TabPanel key="treasury">
         <TreasuryTabPanel {...props} key={"treasuryTabPanel"} />
+      </TabPanel>
+    ),
+  },
+  {
+    name: "Resources",
+    panel: (props) => (
+      <TabPanel key="resources">
+        <ResourcesTabPanel {...props} key={"resourceTabPanel"} />
       </TabPanel>
     ),
   },

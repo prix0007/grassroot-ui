@@ -27,7 +27,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { IRewardTier } from "../../pages/crowdfunding/new";
+import { IRewardTier } from "../../pages/dao/[id]/campaign/new";
 import { isValidNumberString } from "./step2";
 
 type IStep4 = {

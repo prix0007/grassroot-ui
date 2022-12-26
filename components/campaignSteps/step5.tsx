@@ -14,7 +14,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FaDiscord, FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
-import { ISocialDetails } from "../../pages/crowdfunding/new";
+import { ISocialDetails } from "../../pages/dao/[id]/campaign/new";
 
 const NotificationIcon = createIcon({
   displayName: "Notification",

@@ -18,7 +18,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import React, { useCallback, useRef } from "react";
-import { ICampaignBasicDetails } from "../../pages/crowdfunding/new";
+import { ICampaignBasicDetails } from "../../pages/dao/[id]/campaign/new";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import { CloseIcon } from "@chakra-ui/icons";

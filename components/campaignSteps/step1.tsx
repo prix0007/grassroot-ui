@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { BsFillImageFill } from "react-icons/bs";
-import { IProfileDetails } from "../../pages/crowdfunding/new";
+import { IProfileDetails } from "../../pages/dao/[id]/campaign/new";
 
 type IForm1 = {
   adminDetails: IProfileDetails;

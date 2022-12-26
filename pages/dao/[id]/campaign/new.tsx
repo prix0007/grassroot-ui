@@ -23,17 +23,17 @@ import {
 } from "@chakra-ui/react";
 
 import { useToast } from "@chakra-ui/react";
-import BackButton from "../../components/BackButton";
+import BackButton from "../../../../components/BackButton";
 import { useRouter } from "next/router";
 import { BsFillImageFill } from "react-icons/bs";
-import Step1 from "../../components/campaignSteps/step1";
-import Step2, { CATEGORIES } from "../../components/campaignSteps/step2";
+import Step1 from "../../../../components/campaignSteps/step1";
+import Step2, { CATEGORIES } from "../../../../components/campaignSteps/step2";
 import { BigNumber, ethers } from "ethers";
-import Step3 from "../../components/campaignSteps/step3";
-import Step4 from "../../components/campaignSteps/step4";
-import Step5 from "../../components/campaignSteps/step5";
+import Step3 from "../../../../components/campaignSteps/step3";
+import Step4 from "../../../../components/campaignSteps/step4";
+import Step5 from "../../../../components/campaignSteps/step5";
 import { useWeb3React } from "@web3-react/core";
-import useCrowdfundingContract from "../../hooks/useCrowdfundingContract";
+import useCrowdfundingContract from "../../../../hooks/useCrowdfundingContract";
 
 const CROWDFUNDING_CONTRACT_ADDRESS =
   "0x6ddC3Bde48ADdE719dee30200587A484b5db2bd7";
@@ -547,7 +547,7 @@ const Multistep = () => {
 const New = () => {
   const router = useRouter();
   const handleBack = () => {
-    router.push("/crowdfunding");
+    router.back();
   };
 
   return (

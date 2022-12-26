@@ -41,20 +41,21 @@ import {
   FaTwitter,
   FaYoutube,
 } from "react-icons/fa";
-import { MdLocalShipping } from "react-icons/md";
 
 import Jdenticon from "react-jdenticon";
 import { createEditor, Editor } from "slate";
 import { withHistory } from "slate-history";
-import { Slate, withReact } from "slate-react";
+import { withReact } from "slate-react";
 
-import BackButton from "../../../components/BackButton";
-import { CATEGORIES } from "../../../components/campaignSteps/step2";
-import useCrowdfundingContract from "../../../hooks/useCrowdfundingContract";
-import useCrowdfundingState from "../../../hooks/useCrowdfundingState";
-import { formatEtherscanLink, shortenHex } from "../../../util";
-import { CONTRACT_ADDRESS } from "../explore";
-import { ICampaignFormState } from "../new";
+import BackButton from "../../../../components/BackButton";
+import { CATEGORIES } from "../../../../components/campaignSteps/step2";
+import useCrowdfundingContract from "../../../../hooks/useCrowdfundingContract";
+import useCrowdfundingState from "../../../../hooks/useCrowdfundingState";
+import { formatEtherscanLink, shortenHex } from "../../../../util";
+
+import { ICampaignFormState } from "./new";
+
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
 export const SocialSlugToIcon = (socialSlug: string) => {
   switch (socialSlug) {
@@ -74,7 +75,7 @@ export const SocialSlugToIcon = (socialSlug: string) => {
 const Campaign = () => {
   const router = useRouter();
   const handleBack = () => {
-    router.push("/crowdfunding/explore");
+    router.back();
   };
 
   const toast = useToast();
@@ -85,8 +86,8 @@ const Campaign = () => {
   const { data } = useCrowdfundingState(CONTRACT_ADDRESS);
 
   const campaign = useMemo(() => {
-    if (router.query.id) {
-      const id = parseInt(router.query.id as string);
+    if (router.query.campaignid) {
+      const id = parseInt(router.query.campaignid as string);
       if (id < data?.campaigns.length) {
         return data?.campaigns[id];
       }

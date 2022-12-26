@@ -1,10 +1,8 @@
 import { BigNumber, ethers } from "ethers";
 import useSWR from "swr";
 import { GrassrootCrowdfunding } from "../contracts/types/GrassrootCrowdfunding";
-import index from "../pages/crowdfunding";
 import useCrowdfundingContract from "./useCrowdfundingContract";
 import useKeepSWRDataLiveAsBlocksArrive from "./useKeepSWRDataLiveAsBlocksArrive";
-import useTokenContract from "./useTokenContract";
 
 export type ICampaignBC = {
   id: number;

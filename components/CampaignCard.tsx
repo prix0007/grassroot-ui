@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   Box,
@@ -21,6 +20,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Input,
+  Image,
   InputGroup,
   InputRightElement,
   useToast,
@@ -36,6 +36,7 @@ import { useWeb3React } from "@web3-react/core";
 import { GrassrootCrowdfunding } from "../contracts/types";
 import { useMemo, useState } from "react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
 
 type ICampaignCard = {
   campaign: ICampaignBC;
@@ -43,12 +44,12 @@ type ICampaignCard = {
 };
 
 const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
+  const router = useRouter();
+
   const { chainId } = useWeb3React();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const toast = useToast();
-
-  const validUntilDate = new Date(campaign.validUntil.toNumber() * 1000);
 
   const DECIMALS = 18;
   const [donateAmount, setDonateAmount] = useState(
@@ -56,17 +57,6 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
   );
 
   const [isLoading, setLoading] = useState(false);
-
-  const percentage = useMemo(() => {
-    const collected = parseFloat(
-      ethers.utils.formatUnits(campaign.tokenCollected, DECIMALS)
-    );
-    const total = parseFloat(
-      ethers.utils.formatUnits(campaign.targetAmount, DECIMALS)
-    );
-    const percent = (collected / total) * 100;
-    return percent.toFixed(2);
-  }, []);
 
   const handleDonate = async () => {
     if (donateAmount && donateAmount.trim()) {
@@ -110,7 +100,7 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
   };
 
   return (
-    <Center py={6}>
+    <Center position={"relative"}>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -156,30 +146,28 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
         </ModalContent>
       </Modal>
       <Box
+        h={"100%"}
+        width={"100%"}
+        pos={"absolute"}
+        left={0}
+        top={0}
+        backgroundImage={
+          "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        }
+        backgroundSize={"cover"}
+      >
+      </Box>
+      <Box
         maxW={"445px"}
         w={"full"}
-        bg={useColorModeValue("white", "gray.900")}
+        bg={useColorModeValue("whiteAlpha.800", "blackAlpha.800")}
         boxShadow={"2xl"}
         rounded={"md"}
-        p={6}
+        p={4}
         overflow={"hidden"}
+        zIndex={1}
+        mt={"100px"}
       >
-        <Box
-          h={"210px"}
-          bg={"gray.100"}
-          mt={-6}
-          mx={-6}
-          mb={6}
-          pos={"relative"}
-        >
-          <Image
-            src={
-              "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-            }
-            layout={"fill"}
-            alt={""}
-          />
-        </Box>
         <Stack>
           <Text
             color={"green.500"}
@@ -203,71 +191,13 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
             >
               {ethers.utils.parseBytes32String(campaign.campaignName)}
             </Heading>
-            <Link href={`/crowdfunding/campaign/${campaign.id}`} style={{ padding: 0, margin: 0 }}>
+            <Link
+              href={`${router.asPath}/campaign/${campaign.id}`}
+              style={{ padding: 0, margin: 0 }}
+            >
               <ExternalLinkIcon />
             </Link>
           </Stack>
-          <Stack>
-            <Text textAlign={"center"}>Target Amount</Text>
-            <Text textAlign={"center"} fontWeight={"bold"} color={"green.400"}>
-              {ethers.utils.formatUnits(campaign.targetAmount, DECIMALS)} USDC
-            </Text>
-          </Stack>
-          <Text color={"gray.500"}>Amount Collected: {percentage} %</Text>
-          <Progress hasStripe value={parseInt(percentage)} />
-          <Divider my={2} />
-          <Text fontWeight={600}>
-            Valid Until: {validUntilDate.toLocaleDateString()} |{" "}
-            {validUntilDate.toLocaleTimeString()}
-          </Text>
-          <Divider my={2} />
-          <Stack>
-            <Flex justifyContent={"space-between"}>
-              <Text
-                background={"blue.900"}
-                px={2}
-                borderRadius={"full"}
-                color={"blue.500"}
-                textTransform={"uppercase"}
-                fontWeight={800}
-                fontSize={"sm"}
-                letterSpacing={1.1}
-              >
-                {campaign.isCompleted ? "Completed" : "Active"}
-              </Text>
-              <Text
-                color={"green.500"}
-                textTransform={"uppercase"}
-                fontWeight={800}
-                fontSize={"sm"}
-                letterSpacing={1.1}
-              >
-                {!campaign.isRedeemed ? "Not Redeemed" : "Redeemed"}
-              </Text>
-            </Flex>
-          </Stack>
-          <Divider my={2} />
-          <Text color={"gray.500"}>
-            Min. Contribution:{" "}
-            <Text as={"span"} color={"blue.300"}>
-              {ethers.utils.formatUnits(
-                campaign.minAmountContribution,
-                DECIMALS
-              )}{" "}
-              USDC
-            </Text>
-          </Text>
-          <ChakraLink
-            fontWeight={400}
-            target="_blank"
-            rel="noopener noreferrer"
-            href={formatEtherscanLink("Account", [
-              chainId,
-              campaign.campaignAdmin,
-            ])}
-          >
-            USDC Address : {shortenHex(campaign.tokenAddress, 4)}
-          </ChakraLink>
         </Stack>
         <Divider my={2} />
         <Stack direction={"row"} spacing={4} align={"center"}>
@@ -279,17 +209,6 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
             fontSize={"sm"}
             w={"full"}
           >
-            <ChakraLink
-              fontWeight={600}
-              target="_blank"
-              rel="noopener noreferrer"
-              href={formatEtherscanLink("Account", [
-                chainId,
-                campaign.campaignAdmin,
-              ])}
-            >
-              Admin : {shortenHex(campaign.campaignAdmin, 6)}
-            </ChakraLink>
             <Button size={"sm"} colorScheme={"blue"} onClick={onOpen}>
               Fund Me
             </Button>

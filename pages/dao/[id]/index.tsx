@@ -18,9 +18,9 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
-import DaoTabs from "../../components/dao/daoTabs";
-import { makeGraphQLInstance } from "../../graphql";
-import { useDaoQuery } from "../../hooks/daos";
+import DaoTabs from "../../../components/dao/daoTabs";
+import { makeGraphQLInstance } from "../../../graphql";
+import { useDaoQuery } from "../../../hooks/daos";
 
 const DAO = () => {
   const {
