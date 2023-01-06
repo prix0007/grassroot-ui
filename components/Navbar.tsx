@@ -3,7 +3,7 @@ import {
   Box,
   Flex,
   Avatar,
-  Link,
+  Link as ChakraLink,
   Button,
   Menu,
   MenuButton,
@@ -15,8 +15,12 @@ import {
   Stack,
   useColorMode,
   Center,
+  IconButton,
+  Text,
 } from "@chakra-ui/react";
-import { MoonIcon, SunIcon } from "@chakra-ui/icons";
+
+import Link from "next/link";
+import { CloseIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import Account from "./Account";
 import { useWeb3React } from "@web3-react/core";
 import useEagerConnect from "../hooks/useEagerConnect";
@@ -28,7 +32,7 @@ import { shortenHex } from "../util";
 import Jdenticon from "react-jdenticon";
 
 const NavLink = ({ children }: { children: ReactNode }) => (
-  <Link
+  <ChakraLink
     px={2}
     py={1}
     rounded={"md"}
@@ -39,33 +43,39 @@ const NavLink = ({ children }: { children: ReactNode }) => (
     href={"#"}
   >
     {children}
-  </Link>
+  </ChakraLink>
 );
 
 export default function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const { account, library } = useWeb3React();
+  const { account, library, deactivate } = useWeb3React();
 
   const triedToEagerConnect = useEagerConnect();
 
   const isConnected = typeof account === "string" && !!library;
+
   return (
     <>
-      <Box bg={useColorModeValue("gray.100", "gray.900")} px={4}>
+      <Box bg={useColorModeValue("gray.100", "gray.900")} py={2} px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
-          <Box
-            backgroundColor={colorMode === "dark" && "white"}
-            borderRadius={10}
-          >
-            <Image
-              src={grassrootIcon}
-              alt={"Grassroot Icon"}
-              width={170}
-              height={70}
-            />
-          </Box>
+          <Link href={`/`}>
+            <Box
+              backgroundColor={
+                colorMode === "dark" ? "whiteAlpha.800" : "white"
+              }
+              borderColor={"darkgrey"}
+              borderWidth={"1px"}
+              borderRadius={10}
+            >
+              <Image
+                src={grassrootIcon}
+                alt={"Grassroot Icon"}
+                width={170}
+                height={60}
+              />
+            </Box>
+          </Link>
 
           <Flex alignItems={"center"}>
             <Stack direction={"row"} spacing={7}>
@@ -73,40 +83,49 @@ export default function Navbar() {
                 {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               </Button>
 
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rounded={"full"}
-                  variant={"link"}
-                  cursor={"pointer"}
-                  _hover={{
-                    border: "gray.800",
-                    borderWidth: "1px"
-                  }}
-                  minW={0}
-                >
-                  <Jdenticon size={"30"} value={account || ""} />
-                </MenuButton>
-                <MenuList alignItems={"center"}>
-                  <br />
-                  <Center>
-                    <Jdenticon size={"50"} value={account || ""} />
-                  </Center>
-                  <Center>
-                    <p>{account && shortenHex(account, 4)}</p>
-                  </Center>
-                  <br />
-                  <MenuDivider />
-                  <MenuItem>Your Profile</MenuItem>
-                  <MenuItem>
-                    <ETHBalance />
-                  </MenuItem>
-                  <MenuItem>Logout</MenuItem>
-                  <MenuItem>
-                    <Account triedToEagerConnect={triedToEagerConnect} />
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+              <Account triedToEagerConnect={triedToEagerConnect} />
+
+              {isConnected && (
+                <Menu>
+                  {({ isOpen, onClose }) => (
+                    <>
+                      <MenuButton
+                        as={Button}
+                        rounded={"full"}
+                        variant={"link"}
+                        cursor={"pointer"}
+                        minW={0}
+                      >
+                        {isOpen ? (
+                          <IconButton
+                            aria-label="close naivation menu"
+                            onClick={onClose}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        ) : (
+                          <Jdenticon size={"30"} value={account ?? ""} />
+                        )}
+                      </MenuButton>
+                      <MenuList alignItems={"center"}>
+                        <br />
+                        <Center>
+                          <Link href={`/profile/${account}`}>
+                            <Text>{account && shortenHex(account, 4)}</Text>
+                          </Link>
+                        </Center>
+                        <br />
+                        <MenuDivider />
+                        <MenuItem>Your Profile</MenuItem>
+                        <MenuItem>
+                          <ETHBalance />
+                        </MenuItem>
+                        <MenuItem onClick={deactivate}>Logout</MenuItem>
+                      </MenuList>
+                    </>
+                  )}
+                </Menu>
+              )}
             </Stack>
           </Flex>
         </Flex>

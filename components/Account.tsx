@@ -1,10 +1,10 @@
-
 import { Box, Button } from "@chakra-ui/react";
-import { useWeb3React } from "@web3-react/core";
+import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { UserRejectedRequestError } from "@web3-react/injected-connector";
 import { useEffect, useState } from "react";
 import { GiFoxTail, GiWallet } from "react-icons/gi";
 import { injected } from "../connectors";
+import { useWalletErrors, WalletErrorsType } from "../hooks/error";
 import useENSName from "../hooks/useENSName";
 import useMetaMaskOnboarding from "../hooks/useMetaMaskOnboarding";
 
@@ -13,8 +13,9 @@ type AccountProps = {
 };
 
 const Account = ({ triedToEagerConnect }: AccountProps) => {
-  const { active, error, activate, chainId, account, setError } =
-    useWeb3React();
+  const { active, error, activate, chainId, account } = useWeb3React();
+
+  const walletErrors = useWalletErrors();
 
   const {
     isMetaMaskInstalled,
@@ -32,9 +33,7 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
     }
   }, [active, error, stopOnboarding]);
 
-
-
-  const ENSName = useENSName(account);
+  // const ENSName = useENSName(account);
 
   if (error) {
     return null;
@@ -74,10 +73,19 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
               activate(injected, undefined, true).catch((error) => {
                 // ignore the error if it's a user rejected request
                 if (error instanceof UserRejectedRequestError) {
-                  setConnecting(false);
+                  walletErrors(
+                    WalletErrorsType.USER_REJECTED,
+                    error.toString()
+                  );
+                } else if (error instanceof UnsupportedChainIdError) {
+                  walletErrors(
+                    WalletErrorsType.UNSUPPORTED_CHAIN,
+                    error.toString()
+                  );
                 } else {
-                  setError(error);
+                  walletErrors(WalletErrorsType.OTHER, error.toString());
                 }
+                setConnecting(false);
               });
             }}
           >

@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import theme from "../theme";
 import SideNavbar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
 
 const client = new ApolloClient({
   uri:
@@ -28,10 +29,8 @@ function NextWeb3App({ Component, pageProps }: AppProps) {
       <ApolloProvider client={client}>
         <ChakraProvider theme={theme}>
           <Web3ReactProvider getLibrary={getLibrary}>
+            <Navbar />
             <Flex alignItems={"stretch"}>
-              <SideNavbar>
-                <div></div>
-              </SideNavbar>
               <Flex
                 flexGrow={1}
                 flexDirection={"column"}

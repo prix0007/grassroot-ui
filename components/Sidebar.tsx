@@ -294,7 +294,6 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
               <MenuItem onClick={deactivate} textColor={"red.600"}>
                 Logout
               </MenuItem>
-              <MenuItem></MenuItem>
             </MenuList>
           </Menu>
         )}
