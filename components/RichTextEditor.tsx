@@ -12,6 +12,18 @@ import {
 import { withHistory } from "slate-history";
 
 import { Button, Icon, Toolbar } from "./EditorComponents";
+import { Fa500Px, FaBold, FaCode, FaItalic, FaUnderline } from "react-icons/fa";
+import {
+  MdFormatListBulleted,
+  MdFormatListNumbered,
+  MdFormatQuote,
+  MdOutlineFormatAlignCenter,
+  MdOutlineFormatAlignJustify,
+  MdOutlineFormatAlignLeft,
+  MdOutlineFormatAlignRight,
+  MdOutlineLooksOne,
+  MdOutlineLooksTwo,
+} from "react-icons/md";
 
 const HOTKEYS = {
   "mod+b": "bold",
@@ -241,7 +253,7 @@ const BlockButton = ({ format, icon }) => {
         toggleBlock(editor, format);
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon>{getIcon(icon)}</Icon>
     </Button>
   );
 };
@@ -256,9 +268,53 @@ const MarkButton = ({ format, icon }) => {
         toggleMark(editor, format);
       }}
     >
-      <Icon>{icon}</Icon>
+      <Icon>{getIcon(icon)}</Icon>
     </Button>
   );
+};
+
+const getIcon = (type: string) => {
+  switch (type) {
+    case "format_bold":
+      return <FaBold />;
+      break;
+    case "format_italic":
+      return <FaItalic />;
+      break;
+    case "format_underlined":
+      return <FaUnderline />;
+      break;
+    case "code":
+      return <FaCode />;
+      break;
+    case "looks_one":
+      return <MdOutlineLooksOne />;
+      break;
+    case "looks_two":
+      return <MdOutlineLooksTwo />;
+      break;
+    case "format_quote":
+      return <MdFormatQuote />;
+      break;
+    case "format_list_numbered":
+      return <MdFormatListNumbered />;
+      break;
+    case "format_list_bulleted":
+      return <MdFormatListBulleted />;
+      break;
+    case "format_align_left":
+      return <MdOutlineFormatAlignLeft />;
+      break;
+    case "format_align_center":
+      return <MdOutlineFormatAlignCenter />;
+      break;
+    case "format_align_right":
+      return <MdOutlineFormatAlignRight />;
+      break;
+    case "format_align_justify":
+      return <MdOutlineFormatAlignJustify />;
+      break;
+  }
 };
 
 export default RichTextEditor;

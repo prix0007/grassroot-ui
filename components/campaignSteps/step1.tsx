@@ -175,7 +175,7 @@ const Step1: React.FC<IForm1> = ({ adminDetails, setAdminDetails }) => {
         <FormLabel htmlFor="address" fontWeight={"normal"}>
           Your Wallet Address
         </FormLabel>
-        <Input id="address" type="text" disabled value={adminDetails.address} />
+        <Input id="address" type="text" disabled value={adminDetails.address} onChange={() => {}}/>
         <FormHelperText>This is prefilled your ETH Address.</FormHelperText>
       </FormControl>
       <FormControl mt="2%">

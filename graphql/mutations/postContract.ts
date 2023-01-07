@@ -5,6 +5,7 @@ export const POST_DAO = gql`
     $backgroundPicture: String!
     $profilePicture: String!
     $name: String!
+    $blockchainDaoId: String!
     $description: String!
     $metadata: JSON!
   ) {
@@ -13,6 +14,7 @@ export const POST_DAO = gql`
         backgroundPicture: $backgroundPicture
         profilePicture: $profilePicture
         description: $description
+        blockchainDaoId: $blockchainDaoId
         metadata: $metadata
         name: $name
       }

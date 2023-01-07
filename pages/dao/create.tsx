@@ -44,6 +44,8 @@ import { DAOS } from "../../contracts/types";
 import { makeGraphQLInstance } from "../../graphql";
 import { postDao, POSTDAOProps } from "../../hooks/daos";
 import ImageDropper from "../../components/ImageDropper";
+import BackButton from "../../components/common/BackButton";
+import { useSignInUser } from "../../hooks/user";
 
 export type CreateDAOPropsBC = {
   name: string;
@@ -95,7 +97,7 @@ interface Form2 extends FormProp {
   handleTagAdd: any;
   handleTagRemove: any;
   handleImageSet: (key: string, url: string) => any;
-  tokens: any;
+  accessToken: any;
 }
 
 const Form1: React.FC<FormProp> = ({ state, handleChange }) => {
@@ -149,7 +151,7 @@ const Form2: React.FC<Form2> = ({
   handleTagAdd,
   handleTagRemove,
   handleImageSet,
-  tokens,
+  accessToken,
 }) => {
   return (
     <Stack width={"xl"}>
@@ -160,13 +162,13 @@ const Form2: React.FC<Form2> = ({
         handleFileUploaded={handleImageSet}
         propKey={"profilePicture"}
         heading={"Profile Picture"}
-        token={tokens?.accessToken}
+        token={accessToken}
       />
       <ImageDropper
         handleFileUploaded={handleImageSet}
         propKey={"backgroundPicture"}
         heading={"Background Picture"}
-        token={tokens?.accessToken}
+        token={accessToken}
       />
       <Flex justifyContent={"space-between"} my={2} direction={"row"}>
         <Box w={"50%"} pr={2}>
@@ -481,29 +483,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
   }, [isConnected]);
 
   // A Better way to fetch tokens and check.
-  const queryLoc = useQuery({
-    queryKey: [ACCESS_TOKEN_KEYS],
-    queryFn: () => {
-      let tokens = localStorage.getItem(ACCESS_TOKEN_KEYS);
-      if (!tokens) {
-        throw new Error("Must be logged in to use this feature.");
-      } else {
-        return JSON.parse(tokens)[account];
-      }
-    },
-    refetchInterval: 3000,
-    cacheTime: 3000,
-    onError: (error) => {
-      toast({
-        title: "Please Login.",
-        description: "You need to be logged in to create a DAO.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      Router.push("/");
-    },
-  });
+  const { isLoggedIn, accessToken, currentUser } = useSignInUser(account);
 
   const fileMutation = useMutation({
     mutationFn: (metadata: any) => {
@@ -518,7 +498,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
         form,
         {
           headers: {
-            Authorization: `Bearer ${queryLoc.data?.accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -544,27 +524,24 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
         duration: 3000,
         isClosable: true,
       });
+
       try {
-        const tx = await daoContract.createDao(
-          formState.name,
-          formState.description,
-          metadataUrl
-        );
+        const counter = await daoContract._daosCounter();
+        const tx = await daoContract.createDao(formState.name, metadataUrl);
         const txReceipt = await tx.wait();
         const variables: POSTDAOProps = {
           name: formState?.name,
           description: formState?.description,
           backgroundPicture: formState?.backgroundPicture || "",
           profilePicture: formState?.profilePicture,
+          blockchainDaoId: counter.toString(),
           metadata: {
             daoData: formState,
             ipfsMetadata: fileRepsonse,
             transactionData: txReceipt,
-          },
+          }
         };
-
         daoCreate.mutate(variables);
-
         toast({
           title: "Created DAO Successfully",
           description: `DAO is created on transaction ${txReceipt.transactionHash}.`,
@@ -572,7 +549,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
           duration: 3000,
           isClosable: true,
         });
-        Router.push("/");
+        Router.replace("/");
       } catch (e) {
         toast({
           title: "Creating Failed for Blockchain.",
@@ -586,7 +563,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
   });
 
   // Login Client to the Backend
-  const client = makeGraphQLInstance(queryLoc?.data?.accessToken);
+  const client = makeGraphQLInstance(accessToken);
   const daoCreate = postDao(client);
 
   const handleSubmit = async () => {
@@ -621,7 +598,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
             tagRef={tagRef}
             handleTagAdd={handleAddTag}
             handleTagRemove={handleRemoveTag}
-            tokens={queryLoc.data}
+            accessToken={accessToken}
             handleImageSet={handleImageSet}
           />
         )}
@@ -684,7 +661,6 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
 
 const CreateDao = () => {
   const DAOContract = useDAOSContract(process.env.NEXT_PUBLIC_DAOS_ADDRESS);
-
   return (
     <Stack
       align={"center"}
@@ -692,7 +668,10 @@ const CreateDao = () => {
       py={{ base: 20, md: 25 }}
       direction={{ base: "column" }}
     >
-      <Heading>Create DAO for your CAUSE</Heading>
+      <Flex justifyContent={"space-between"}>
+        <BackButton />
+        <Heading ml={"50px"}>Create DAO for your CAUSE</Heading>
+      </Flex>
       <DAOForm daoContract={DAOContract} />
     </Stack>
   );

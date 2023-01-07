@@ -69,7 +69,7 @@ export const COUNTRIES = [
 const ACCEPTED_TOKENS = [
   {
     name: "USDC",
-    address: "0xD506311F5Fb228974FA81c747354307ed3FBEaD5",
+    address: "0x7163e7B49F2D3bbeed78Ec8FD40Ec93621E0dd15",
     network: "polygon",
   },
 ];
@@ -399,7 +399,7 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
               my={2}
               mx={1}
             >
-              <TagLabel>{tag}</TagLabel>
+              <TagLabel>#{tag}</TagLabel>
               <TagCloseButton onClick={() => handleRemoveTag(idx)} />
             </Tag>
           );
@@ -410,6 +410,12 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
             type={"text"}
             placeholder="Type to add a new tag."
             ref={tagRef}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleAddTag();
+                e.preventDefault();
+              }
+            }}
           />
           <InputRightElement width="7.5rem">
             <Button

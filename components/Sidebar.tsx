@@ -177,7 +177,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 
       try {
         const signature = await signer?.signMessage(message);
-        console.log(signature);
+       
         // Post Signature to Create a New User here.
         createUser({
           variables: {

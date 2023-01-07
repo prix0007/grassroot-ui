@@ -1,4 +1,13 @@
-import { Box, Button, Flex, Grid, GridItem, Heading, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useCrowdfundingContract from "../../../hooks/useCrowdfundingContract";
@@ -8,11 +17,10 @@ import CampaignCard from "../../CampaignCard";
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
 const CampaignsTabPanel = () => {
+  const router = useRouter();
 
-  const router = useRouter()
-
-  const { data } = useCrowdfundingState(CONTRACT_ADDRESS);
-
+  // const { data } = useCrowdfundingState(CONTRACT_ADDRESS);
+  const data = undefined;
   const contract = useCrowdfundingContract(CONTRACT_ADDRESS);
 
   return (
@@ -39,6 +47,10 @@ const CampaignsTabPanel = () => {
               </GridItem>
             );
           })}
+          {
+            data === undefined && 
+            <Text>No Campaigns Yet</Text>
+          }
         </Grid>
       </Box>
     </VStack>

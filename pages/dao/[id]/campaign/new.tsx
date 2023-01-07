@@ -23,7 +23,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useToast } from "@chakra-ui/react";
-import BackButton from "../../../../components/BackButton";
+import BackButton from "../../../../components/common/BackButton";
 import { useRouter } from "next/router";
 import { BsFillImageFill } from "react-icons/bs";
 import Step1 from "../../../../components/campaignSteps/step1";
@@ -34,12 +34,14 @@ import Step4 from "../../../../components/campaignSteps/step4";
 import Step5 from "../../../../components/campaignSteps/step5";
 import { useWeb3React } from "@web3-react/core";
 import useCrowdfundingContract from "../../../../hooks/useCrowdfundingContract";
-import { useTokensQuery, useUserQuery } from "../../../../hooks/user";
-import { GraphQLClient } from "graphql-request";
-import { makeGraphQLInstance } from "../../../../graphql";
-
-const CROWDFUNDING_CONTRACT_ADDRESS =
-  "0x6ddC3Bde48ADdE719dee30200587A484b5db2bd7";
+import {
+  useSignInUser,
+  useTokensQuery,
+  useUserQuery,
+} from "../../../../hooks/user";
+import useDAOSContract from "../../../../hooks/useDAOContract";
+import { useDaoQuery } from "../../../../hooks/daos";
+import { useUploadFile } from "../../../../hooks/utils";
 
 // TODO: Rules show in a Modal
 
@@ -180,9 +182,12 @@ interface IPropsMultiStep {
     role: string;
     email: string;
   };
+  daoId: string;
 }
 
-const Multistep: React.FC<IPropsMultiStep> = ({ user }) => {
+const DAOS_CONTRACT = process.env.NEXT_PUBLIC_DAOS_ADDRESS;
+
+const Multistep: React.FC<IPropsMultiStep> = ({ user, daoId }) => {
   const toast = useToast();
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(20.0);
@@ -192,9 +197,8 @@ const Multistep: React.FC<IPropsMultiStep> = ({ user }) => {
 
   const { account, chainId } = useWeb3React();
 
-  const crowdfundingContract = useCrowdfundingContract(
-    CROWDFUNDING_CONTRACT_ADDRESS
-  );
+  const { isLoggedIn, accessToken } = useSignInUser(account);
+  const daosContract = useDAOSContract(DAOS_CONTRACT);
 
   const [campaignState, setCampaignState] = useState<ICampaignFormState>({
     ...blankCampaign,
@@ -365,6 +369,86 @@ const Multistep: React.FC<IPropsMultiStep> = ({ user }) => {
     }
   };
 
+  const handleOnUploaded = async (response) => {
+    const cid = response.data?.metadataCid;
+    toast({
+      title: "Metadata Uploaded",
+      description: `Your metadata has been uploaded at ${cid}. Please sign the transaction with metamask to publish it on blockchain.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+
+    const campaignStory = JSON.parse(localStorage.getItem("story"));
+    const metadata = {
+      ...campaignState,
+      story: JSON.stringify(campaignStory),
+      version: "0.1",
+    };
+    const DECIMALS = 18;
+    const futureUnixTimeStamp = new Date(
+      metadata.basic.completionDate
+    ).getTime();
+    const offset = futureUnixTimeStamp - Date.now();
+
+    const finalBCObj = {
+      adminAddress: account,
+      tokenAddress: metadata.basic.tokenCurrency,
+      campaignName: ethers.utils.formatBytes32String(metadata.basic.title),
+      metadataCid: cid,
+      minAmountContribution: ethers.utils.parseUnits(
+        metadata.basic.minAmount,
+        DECIMALS
+      ),
+      targetAmount: ethers.utils.parseUnits(
+        metadata.basic.goalAmount,
+        DECIMALS
+      ),
+      category: CATEGORIES.findIndex(
+        (category) => category === metadata.basic.category
+      ),
+      validUntil: parseInt((offset / 1000).toString()),
+    };
+
+    try {
+      const tx = await daosContract.createCampaign(
+        finalBCObj.adminAddress,
+        finalBCObj.tokenAddress,
+        finalBCObj.campaignName,
+        finalBCObj.metadataCid,
+        finalBCObj.minAmountContribution,
+        finalBCObj.targetAmount,
+        finalBCObj.category,
+        finalBCObj.validUntil,
+        BigNumber.from(daoId)
+      );
+      await tx.wait();
+      toast({
+        title: "Campaign Created Successfully.",
+        description: `Your transaction has been successfully sent.`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      // Post to Backend Here.
+      // localStorage.setItem("story", "");
+    } catch (e) {
+      console.log(e);
+      toast({
+        title: "Something went wrong.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    setLoading(false);
+  };
+
+  const { mutate: fileUpload, data: fileUploadData } = useUploadFile(
+    accessToken,
+    handleOnUploaded
+  );
+
   const handleCampaignSubmission = async () => {
     const campaignStory = JSON.parse(localStorage.getItem("story"));
 
@@ -373,91 +457,11 @@ const Multistep: React.FC<IPropsMultiStep> = ({ user }) => {
       story: JSON.stringify(campaignStory),
       version: "0.1",
     };
-
     console.log("File Metadata Pushing", metadata);
+
+    // Give to file mutation
+    fileUpload(JSON.stringify(metadata));
     setLoading(true);
-    try {
-      const res = await fetch("/api/storage", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(metadata),
-      });
-
-      const { cid } = await res.json();
-
-      console.log(cid);
-
-      const DECIMALS = 18;
-      const futureUnixTimeStamp = new Date(
-        metadata.basic.completionDate
-      ).getTime();
-      const offset = futureUnixTimeStamp - Date.now();
-
-      const finalBCObj = {
-        adminAddress: account,
-        tokenAddress: metadata.basic.tokenCurrency,
-        campaignName: ethers.utils.formatBytes32String(metadata.basic.title),
-        metadataCid: cid,
-        minAmountContribution: ethers.utils.parseUnits(
-          metadata.basic.minAmount,
-          DECIMALS
-        ),
-        targetAmount: ethers.utils.parseUnits(
-          metadata.basic.goalAmount,
-          DECIMALS
-        ),
-        category: CATEGORIES.findIndex(
-          (category) => category === metadata.basic.category
-        ),
-        validUntil: parseInt((offset / 1000).toString()),
-      };
-
-      console.log(finalBCObj);
-
-      toast({
-        title: "Metadata Uploaded",
-        description: `Your metadata has been uploaded at ${cid}. Please sign the transaction with metamask to publish it on blockchain.`,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-
-      try {
-        const tx = await crowdfundingContract.createCampaign(
-          finalBCObj.adminAddress,
-          finalBCObj.tokenAddress,
-          finalBCObj.campaignName,
-          finalBCObj.metadataCid,
-          finalBCObj.minAmountContribution,
-          finalBCObj.targetAmount,
-          finalBCObj.category,
-          finalBCObj.validUntil
-        );
-        await tx.wait();
-        toast({
-          title: "Campaign Created Successfully.",
-          description: `Your transaction has been successfully sent.`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      } catch (e) {
-        console.log(e);
-        toast({
-          title: "Something went wrong.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-
-      // localStorage.setItem("story", "");
-    } catch (e) {
-      console.log(e);
-    }
-    setLoading(false);
   };
 
   const handleConnectionValidation = () => {
@@ -496,7 +500,6 @@ const Multistep: React.FC<IPropsMultiStep> = ({ user }) => {
                 variant="solid"
                 w="7rem"
                 mr="5%"
-                disabled={isLoading}
               >
                 Back
               </Button>
@@ -559,6 +562,10 @@ const Multistep: React.FC<IPropsMultiStep> = ({ user }) => {
   );
 };
 
+const getId = (path: string) => {
+  return path.split("/").at(2);
+};
+
 const New = () => {
   const router = useRouter();
   const handleBack = () => {
@@ -566,18 +573,14 @@ const New = () => {
   };
 
   const { account } = useWeb3React();
-
-  const { data, isLoading, isError } = useTokensQuery(account);
-
+  const { isLoggedIn, currentUser } = useSignInUser(account);
   useEffect(() => {
-    if (!isLoading && !isError && !data.accessToken || !account) {
-      router.back();
+    if (!isLoggedIn) {
+      router.push("/");
     }
-  }, [data, account]);
+  }, [isLoggedIn]);
 
-  const client = makeGraphQLInstance(data?.accessToken);
-
-  const { data: currentUser } = useUserQuery(client);
+  const { data: daoData } = useDaoQuery({ id: getId(router.asPath) });
 
   return (
     <Box w="100%" p={4} background={"none"}>
@@ -598,7 +601,7 @@ const New = () => {
         It&apos;s totally autonomous, we don&apos;t take any charges on extra
         services, only 2% if your goal is reached.
       </Text>
-      <Multistep user={currentUser?.me} />
+      <Multistep user={currentUser} daoId={daoData?.daoById?.blockchainDaoId} />
     </Box>
   );
 };

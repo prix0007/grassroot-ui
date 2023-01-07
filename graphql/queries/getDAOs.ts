@@ -11,6 +11,7 @@ export const GET_ALL_DAOS = gql`
       description
       metadata
       id
+      blockchainDaoId
     }
   }
 `;
@@ -20,6 +21,7 @@ export const GET_DAO_BY_ID = gql`
     daoById(id: $id) {
       adminAddress
       adminId
+      blockchainDaoId
       name
       profilePicture
       backgroundPicture
@@ -41,6 +43,7 @@ export const GET_MY_DAOS = gql`
       backgroundPicture
       description
       metadata
+      blockchainDaoId
     }
   }
 `;

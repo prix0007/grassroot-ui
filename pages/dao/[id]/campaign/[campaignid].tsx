@@ -47,7 +47,7 @@ import { createEditor, Editor } from "slate";
 import { withHistory } from "slate-history";
 import { withReact } from "slate-react";
 
-import BackButton from "../../../../components/BackButton";
+import BackButton from "../../../../components/common/BackButton";
 import { CATEGORIES } from "../../../../components/campaignSteps/step2";
 import useCrowdfundingContract from "../../../../hooks/useCrowdfundingContract";
 import useCrowdfundingState from "../../../../hooks/useCrowdfundingState";

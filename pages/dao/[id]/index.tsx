@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
+import BackButton from "../../../components/common/BackButton";
 import DaoTabs from "../../../components/dao/daoTabs";
 import { makeGraphQLInstance } from "../../../graphql";
 import { useDaoQuery } from "../../../hooks/daos";
@@ -27,9 +28,7 @@ const DAO = () => {
     query: { id },
   } = useRouter();
 
-  const client = makeGraphQLInstance("");
-
-  const { isLoading, isError, isFetched, data } = useDaoQuery(client, {
+  const { isLoading, isError, isFetched, data } = useDaoQuery({
     id: id as string,
   });
 
@@ -69,6 +68,17 @@ const DAO = () => {
               backgroundSize={"cover"}
               backgroundPosition={"center center"}
             />
+            <BackButton
+              //@ts-ignore 
+              position={"absolute"}
+              background={"blackAlpha.700"}
+              borderWidth={"1px"}
+              _hover={{
+                background: "blackAlpha.600",
+              }}
+              mt={"10px"}
+              ml={"10px"}
+            />
             <Stack
               display={"flex"}
               direction={flexDir}
@@ -89,7 +99,10 @@ const DAO = () => {
                 alignSelf={"stretch"}
               >
                 <Image
-                  src={new URL(data?.daoById?.profilePicture).toString()}
+                  src={new URL(
+                    data?.daoById?.profilePicture ||
+                      "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png"
+                  ).toString()}
                   alt={data?.daoById?.name}
                   maxW={150}
                   maxH={150}

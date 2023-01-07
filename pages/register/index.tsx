@@ -1,7 +1,7 @@
 import { Box, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import React from "react";
-import BackButton from "../../components/BackButton";
+import BackButton from "../../components/common/BackButton";
 
 const Index = () => {
   const router = useRouter();

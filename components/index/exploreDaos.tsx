@@ -42,7 +42,7 @@ const ExploreDaos = () => {
                 name={dao?.name}
                 author={dao?.adminAddress}
                 members={[]}
-                image={dao?.profilePicture}
+                image={dao?.profilePicture || "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png"}
                 href={`/dao/${dao?.id}`}
               />
             );

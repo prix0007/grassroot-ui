@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { GraphQLClient, request } from "graphql-request";
+import { makeGraphQLInstance } from "../../graphql";
 import { POST_DAO } from "../../graphql/mutations/postContract";
 import { GET_ALL_DAOS, GET_DAO_BY_ID } from "../../graphql/queries/getDAOs";
 
@@ -18,7 +19,8 @@ export interface GetDAOProps {
   id: string;
 }
 
-const useDaoQuery = (client: GraphQLClient, variables: GetDAOProps ) => {
+const useDaoQuery = (variables: GetDAOProps ) => {
+  const client = makeGraphQLInstance("");
   return useQuery({
     queryKey: ["getADao", variables.id],
     queryFn: async () => {
@@ -35,6 +37,7 @@ export interface POSTDAOProps {
   description: string;
   backgroundPicture: string;
   profilePicture: string;
+  blockchainDaoId: string;
   metadata: any;
 }
 

@@ -341,6 +341,19 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_newAllowedAddress",
+        "type": "address"
+      }
+    ],
+    "name": "addAllowedAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "erc20Token",
         "type": "address"
       }
@@ -348,6 +361,25 @@
     "name": "allowERC20Token",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "allowedAddresses",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -730,6 +762,19 @@
       }
     ],
     "name": "renounceRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_address",
+        "type": "address"
+      }
+    ],
+    "name": "revokeAllowedAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

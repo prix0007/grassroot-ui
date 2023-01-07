@@ -17,10 +17,16 @@ import {
   Center,
   IconButton,
   Text,
+  Circle,
 } from "@chakra-ui/react";
 
 import Link from "next/link";
-import { CloseIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
+import {
+  CheckCircleIcon,
+  CloseIcon,
+  MoonIcon,
+  SunIcon,
+} from "@chakra-ui/icons";
 import Account from "./Account";
 import { useWeb3React } from "@web3-react/core";
 import useEagerConnect from "../hooks/useEagerConnect";
@@ -30,6 +36,10 @@ import Image from "next/image";
 import ETHBalance from "./ETHBalance";
 import { shortenHex } from "../util";
 import Jdenticon from "react-jdenticon";
+import { useSignInUser, useTokensQuery } from "../hooks/user";
+import TokenBalance from "./TokenBalance";
+
+const USDC_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS;
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <ChakraLink
@@ -54,6 +64,8 @@ export default function Navbar() {
   const triedToEagerConnect = useEagerConnect();
 
   const isConnected = typeof account === "string" && !!library;
+
+  const { isLoggedIn, accessToken, refreshToken } = useSignInUser(account);
 
   return (
     <>
@@ -108,17 +120,28 @@ export default function Navbar() {
                         )}
                       </MenuButton>
                       <MenuList alignItems={"center"}>
-                        <br />
-                        <Center>
+                        <Center p={0}>
                           <Link href={`/profile/${account}`}>
                             <Text>{account && shortenHex(account, 4)}</Text>
                           </Link>
+                          {isLoggedIn && (
+                            <CheckCircleIcon color="green" ml={2} />
+                          )}
                         </Center>
-                        <br />
                         <MenuDivider />
-                        <MenuItem>Your Profile</MenuItem>
+                        <MenuItem>
+                          <Link href={`/profile/${account}`}>
+                            <Text>Your Profile</Text>
+                          </Link>
+                        </MenuItem>
                         <MenuItem>
                           <ETHBalance />
+                        </MenuItem>
+                        <MenuItem>
+                          <TokenBalance
+                            symbol="USDT"
+                            tokenAddress={USDC_TOKEN_ADDRESS}
+                          />
                         </MenuItem>
                         <MenuItem onClick={deactivate}>Logout</MenuItem>
                       </MenuList>

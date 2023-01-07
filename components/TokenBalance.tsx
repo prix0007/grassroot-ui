@@ -14,7 +14,7 @@ const TokenBalance = ({ tokenAddress, symbol }: TokenBalanceProps) => {
   const { data } = useTokenBalance(account, tokenAddress);
 
   return (
-    <Text textAlign={"center"} my={3} mx={2}>
+    <Text textAlign={"left"}>
       {`${symbol} Balance`}: {parseBalance(data ?? 0, 18, 2)}
     </Text>
   );
