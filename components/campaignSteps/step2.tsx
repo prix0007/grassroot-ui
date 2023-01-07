@@ -66,7 +66,7 @@ export const COUNTRIES = [
   "United States of America",
 ];
 
-const ACCEPTED_TOKENS = [
+export const ACCEPTED_TOKENS = [
   {
     name: "USDC",
     address: "0x7163e7B49F2D3bbeed78Ec8FD40Ec93621E0dd15",

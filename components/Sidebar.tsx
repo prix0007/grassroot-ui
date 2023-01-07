@@ -57,7 +57,7 @@ import BuyToken from "./BuyToken";
 import useCrowdfundingContract from "../hooks/useCrowdfundingContract";
 import AllowanceToken from "./AllowanceToken";
 import { useMutation } from "@apollo/client";
-import { CREATE_NONCE, CREATE_USER_OR_LOGIN } from "../graphql/mutations";
+import { CREATE_NONCE, CREATE_USER_OR_LOGIN } from "../graphql/mutations/user";
 import { ethers } from "ethers";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { ACCESS_TOKEN_KEYS } from "../localStorageKeys";

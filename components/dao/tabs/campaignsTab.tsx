@@ -10,17 +10,24 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Campaign } from "../../../hooks/campaigns";
 import useCrowdfundingContract from "../../../hooks/useCrowdfundingContract";
 import useCrowdfundingState from "../../../hooks/useCrowdfundingState";
 import CampaignCard from "../../CampaignCard";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
-const CampaignsTabPanel = () => {
+export interface ICampaignsTabPanel {
+  activeCampaigns?: Array<Campaign>;
+  daoId: string;
+}
+
+const CampaignsTabPanel: React.FC<ICampaignsTabPanel> = ({
+  activeCampaigns,
+  daoId,
+}) => {
   const router = useRouter();
 
-  // const { data } = useCrowdfundingState(CONTRACT_ADDRESS);
-  const data = undefined;
   const contract = useCrowdfundingContract(CONTRACT_ADDRESS);
 
   return (
@@ -40,17 +47,22 @@ const CampaignsTabPanel = () => {
           }}
           gap={7}
         >
-          {data?.campaigns.map((campaign) => {
+          {activeCampaigns?.map((campaign, index) => {
             return (
-              <GridItem w="100%" key={campaign.metadataCid}>
-                <CampaignCard campaign={campaign} contract={contract} />
+              <GridItem
+                w="100%"
+                key={`${campaign?.metadata?.blockchainData?.metdataCid}-${index}`}
+              >
+                <CampaignCard
+                  newCampaignData={campaign}
+                  campaign={campaign.metadata.metadata}
+                  contract={contract}
+                />
               </GridItem>
             );
           })}
-          {
-            data === undefined && 
-            <Text>No Campaigns Yet</Text>
-          }
+          {activeCampaigns === undefined ||
+            (activeCampaigns.length === 0 && <Text>No Campaigns Yet</Text>)}
         </Grid>
       </Box>
     </VStack>

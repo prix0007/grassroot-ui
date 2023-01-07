@@ -54,6 +54,8 @@ import useCrowdfundingState from "../../../../hooks/useCrowdfundingState";
 import { formatEtherscanLink, shortenHex } from "../../../../util";
 
 import { ICampaignFormState } from "./new";
+import { useCampaignById } from "../../../../hooks/campaigns";
+import { NOT_FOUND_IMAGE } from "..";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
@@ -78,6 +80,14 @@ const Campaign = () => {
     router.back();
   };
 
+  const campaignId = useMemo(() => {
+    if (router.query.campaignid) {
+      return router.query.campaignid;
+    } else {
+      return null;
+    }
+  }, [router.asPath]);
+
   const toast = useToast();
   const { chainId } = useWeb3React();
 
@@ -85,13 +95,21 @@ const Campaign = () => {
 
   const { data } = useCrowdfundingState(CONTRACT_ADDRESS);
 
+  const {
+    data: campaignData,
+    isLoading: campaignIsLoading,
+    isError: campaignIsError,
+  } = useCampaignById(campaignId as string);
+
+  const newCampaign = useMemo(() => campaignData?.campaignById, [campaignData]);
+  const ipfsMetadata = newCampaign?.metadata?.metadata;
+
+  // console.log(ipfsMetadata);
+  // console.log(newCampaign);
+  // console.log(data);
+
   const campaign = useMemo(() => {
-    if (router.query.campaignid) {
-      const id = parseInt(router.query.campaignid as string);
-      if (id < data?.campaigns.length) {
-        return data?.campaigns[id];
-      }
-    }
+    return data?.campaigns[newCampaign?.campaignId - 1];
   }, [data?.campaigns]);
 
   const [donateAmount, setDonateAmount] = useState(
@@ -111,7 +129,7 @@ const Campaign = () => {
     return percent.toFixed(2);
   }, []);
 
-  const validUntilDate = new Date(campaign?.validUntil.toNumber() * 1000);
+  const validUntilDate = new Date(newCampaign?.completionDate);
 
   const contract = useCrowdfundingContract(CONTRACT_ADDRESS);
 
@@ -162,39 +180,13 @@ const Campaign = () => {
 
   const [ipfsCidData, setIpfsCidData] = useState<ICampaignFormState>();
 
-  useEffect(() => {
-    let active = true;
-    load();
-    return () => {
-      active = false;
-    };
-
-    async function load() {
-      const uri = `https://${campaign?.metadataCid}.ipfs.w3s.link/metadata.json`;
-      try {
-        const response = await axios.get(uri);
-        if (!ipfsCidData) {
-          setIpfsCidData(response.data);
-        }
-      } catch (e) {
-        setIpfsCidData(undefined);
-      }
-    }
-
-    // images, adminDetails, story
-  }, [campaign]);
-
   const grayColorModeValue = useColorModeValue("gray.200", "gray.600");
 
   // Editor Stuff
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 
   // Update the initial content to be pulled from Local Storage if it exists.
-  const initialValue = useMemo(
-    () =>
-      ipfsCidData?.story ,
-    [ipfsCidData]
-  );
+  // const initialValue = useMemo(() => ipfsCidData?.story, [ipfsCidData]);
 
   return (
     <Container maxW={"7xl"}>
@@ -204,15 +196,13 @@ const Campaign = () => {
       <SimpleGrid
         columns={{ base: 1, lg: 1 }}
         spacing={{ base: 8, md: 10 }}
-        py={{ base: 18, md: 24 }}
+        py={{ base: 14, md: 16 }}
       >
         <Flex>
           <Image
             rounded={"md"}
             alt={"product image"}
-            src={
-              "https://images.unsplash.com/photo-1596516109370-29001ec8ec36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyODE1MDl8MHwxfGFsbHx8fHx8fHx8fDE2Mzg5MzY2MzE&ixlib=rb-1.2.1&q=80&w=1080"
-            }
+            src={new URL(newCampaign?.images[0] || NOT_FOUND_IMAGE).toString()}
             fit={"cover"}
             align={"center"}
             w={"100%"}
@@ -228,7 +218,7 @@ const Campaign = () => {
               fontSize={"sm"}
               letterSpacing={1.1}
             >
-              {CATEGORIES[campaign?.category]}
+              {CATEGORIES[newCampaign?.metadata?.metadata?.basic?.category]}
             </Text>
             <Stack
               display={"flex"}
@@ -264,11 +254,7 @@ const Campaign = () => {
                 fontWeight={"bold"}
                 color={"green.400"}
               >
-                {ethers.utils.formatUnits(
-                  campaign?.targetAmount || "0",
-                  DECIMALS
-                )}{" "}
-                USDC
+                {newCampaign?.goalAmount} USDC
               </Text>
             </Stack>
             <Text color={"gray.500"}>Amount Collected: {percentage} %</Text>
@@ -387,7 +373,7 @@ const Campaign = () => {
               )}
             </Button>
           </Stack>
-          {!ipfsCidData ? (
+          {!ipfsMetadata ? (
             <CircularProgress isIndeterminate={true} size={"50"} />
           ) : (
             <Stack spacing={{ base: 4, sm: 6 }} direction={"column"}>
@@ -397,12 +383,12 @@ const Campaign = () => {
                   fontSize={"2xl"}
                   fontWeight={"300"}
                 >
-                  {ipfsCidData?.basic?.subtitle}
+                  {ipfsMetadata?.basic?.subtitle}
                 </Text>
               </VStack>
               <Flex>
                 <Text>Tags: </Text>
-                {ipfsCidData.basic?.tags.map((tag, idx) => {
+                {ipfsMetadata.basic?.tags.map((tag, idx) => {
                   return (
                     <Badge key={idx + tag} colorScheme={"blue"} m={1}>
                       #{tag}
@@ -411,12 +397,12 @@ const Campaign = () => {
                 })}
               </Flex>
               <StackDivider borderColor={grayColorModeValue} />
-              
+
               <StackDivider borderColor={grayColorModeValue} />
               <Stack>
                 <Heading size={"lg"}>Rewards</Heading>
                 <Flex display={"flex"} flexWrap={"wrap"}>
-                  {ipfsCidData?.rewards?.map((reward, idx) => {
+                  {ipfsMetadata?.rewards?.map((reward, idx) => {
                     return (
                       reward.title && (
                         <Card maxW="sm" key={reward.title} m={2}>
@@ -447,7 +433,7 @@ const Campaign = () => {
               <Stack>
                 <Heading size={"md"}>Socials</Heading>
                 <Flex display={"flex"} flexWrap={"wrap"}>
-                  {ipfsCidData?.socials.map((social) => {
+                  {ipfsMetadata?.socials.map((social) => {
                     return (
                       social.url && (
                         <Box key={social.slug} m={3}>

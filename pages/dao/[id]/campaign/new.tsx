@@ -27,7 +27,10 @@ import BackButton from "../../../../components/common/BackButton";
 import { useRouter } from "next/router";
 import { BsFillImageFill } from "react-icons/bs";
 import Step1 from "../../../../components/campaignSteps/step1";
-import Step2, { CATEGORIES } from "../../../../components/campaignSteps/step2";
+import Step2, {
+  ACCEPTED_TOKENS,
+  CATEGORIES,
+} from "../../../../components/campaignSteps/step2";
 import { BigNumber, ethers } from "ethers";
 import Step3 from "../../../../components/campaignSteps/step3";
 import Step4 from "../../../../components/campaignSteps/step4";
@@ -42,6 +45,7 @@ import {
 import useDAOSContract from "../../../../hooks/useDAOContract";
 import { useDaoQuery } from "../../../../hooks/daos";
 import { useUploadFile } from "../../../../hooks/utils";
+import { ICreateCampaign, postCampaign } from "../../../../hooks/campaigns";
 
 // TODO: Rules show in a Modal
 
@@ -183,11 +187,17 @@ interface IPropsMultiStep {
     email: string;
   };
   daoId: string;
+  daoIdBackend: string;
 }
 
 const DAOS_CONTRACT = process.env.NEXT_PUBLIC_DAOS_ADDRESS;
+const CAMPAIGNS_CONTRACT = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
-const Multistep: React.FC<IPropsMultiStep> = ({ user, daoId }) => {
+const Multistep: React.FC<IPropsMultiStep> = ({
+  user,
+  daoId,
+  daoIdBackend,
+}) => {
   const toast = useToast();
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(20.0);
@@ -199,6 +209,9 @@ const Multistep: React.FC<IPropsMultiStep> = ({ user, daoId }) => {
 
   const { isLoggedIn, accessToken } = useSignInUser(account);
   const daosContract = useDAOSContract(DAOS_CONTRACT);
+  const camapaignContract = useCrowdfundingContract(CAMPAIGNS_CONTRACT);
+
+  const router = useRouter();
 
   const [campaignState, setCampaignState] = useState<ICampaignFormState>({
     ...blankCampaign,
@@ -422,16 +435,48 @@ const Multistep: React.FC<IPropsMultiStep> = ({ user, daoId }) => {
         finalBCObj.validUntil,
         BigNumber.from(daoId)
       );
-      await tx.wait();
-      toast({
-        title: "Campaign Created Successfully.",
-        description: `Your transaction has been successfully sent.`,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-      // Post to Backend Here.
-      // localStorage.setItem("story", "");
+      const txReceipt = await tx.wait();
+
+      const campaignId = await camapaignContract._crowdfundingsCounter(); // Get this from counter of campaigns contracts
+
+      console.log(campaignId);
+
+      // Need to refix it later
+      const acceptedToken = ACCEPTED_TOKENS.find(
+        (elem) => elem.address === metadata.basic.tokenCurrency
+      );
+
+      const backendCampaignUpdate: ICreateCampaign = {
+        city: metadata.basic.country,
+        campaignId: campaignId.toString(),
+        completionDate: metadata.basic.completionDate,
+        country: metadata.basic.country,
+        goalAmount: metadata.basic.goalAmount,
+        minAmount: metadata.basic.minAmount,
+        videos: metadata.basic.videos || [],
+        images: metadata.basic.images || [],
+        transactionHash: txReceipt.transactionHash,
+        tokenCurrencyAddress: metadata.basic.tokenCurrency,
+        tokenCurrency: acceptedToken?.name || "UDSC",
+        title: metadata.basic.title,
+        subtitle: metadata.basic.subtitle,
+        state: metadata.basic.country,
+        metadata: {
+          metadata: {
+            ...metadata,
+          },
+          blockchainData: {
+            ...finalBCObj,
+          },
+          transactionData: {
+            ...txReceipt,
+          },
+        },
+        daoId: daoIdBackend,
+      };
+
+      // Mutating the backend now.
+      postCampaignToBackend(backendCampaignUpdate);
     } catch (e) {
       console.log(e);
       toast({
@@ -449,7 +494,38 @@ const Multistep: React.FC<IPropsMultiStep> = ({ user, daoId }) => {
     handleOnUploaded
   );
 
+  const handleOnCampaignCreated = (data: any) => {
+    toast({
+      title: "Campaign Created Successfully.",
+      description: `Your transaction has been successfully sent.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+
+    // const routeParts = router.asPath.split("/")
+    // console.log(routeParts);
+    router.back();
+
+    localStorage.setItem("story", "");
+  };
+
+  const { mutate: postCampaignToBackend, data: campaignData } = postCampaign(
+    accessToken,
+    handleOnCampaignCreated
+  );
+
   const handleCampaignSubmission = async () => {
+    if (!isLoggedIn) {
+      toast({
+        title: "Not Logged In.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     const campaignStory = JSON.parse(localStorage.getItem("story"));
 
     const metadata = {
@@ -601,7 +677,11 @@ const New = () => {
         It&apos;s totally autonomous, we don&apos;t take any charges on extra
         services, only 2% if your goal is reached.
       </Text>
-      <Multistep user={currentUser} daoId={daoData?.daoById?.blockchainDaoId} />
+      <Multistep
+        user={currentUser}
+        daoId={daoData?.daoById?.blockchainDaoId}
+        daoIdBackend={daoData?.daoById?.id}
+      />
     </Box>
   );
 };

@@ -27,7 +27,24 @@ export const GET_DAO_BY_ID = gql`
       backgroundPicture
       description
       metadata
-      id
+      id,
+      activeCampaigns {
+        id,
+        title,
+        subtitle,
+        daoId,
+        campaignId,
+        city,
+        completionDate,
+        country,
+        createdAt,
+        updatedAt,
+        goalAmount,
+        minAmount,
+        metadata,
+        images,
+        videos
+      }
     }
   }
 `;

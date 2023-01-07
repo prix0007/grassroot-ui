@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { GraphQLClient, request } from "graphql-request";
 import { makeGraphQLInstance } from "../../graphql";
-import { POST_DAO } from "../../graphql/mutations/postContract";
+import { POST_DAO } from "../../graphql/mutations/dao";
 import { GET_ALL_DAOS, GET_DAO_BY_ID } from "../../graphql/queries/getDAOs";
 
 const useDaosQueries = (client: GraphQLClient) => {
@@ -26,7 +26,7 @@ const useDaoQuery = (variables: GetDAOProps ) => {
     queryFn: async () => {
       return await client.request(GET_DAO_BY_ID, variables);
     },
-    cacheTime: 60 * 60 * 60 * 1000, // 1 hr.
+    cacheTime: 60 * 60 , // 1 min.
     retry: 5,
     enabled: !!variables.id
   });

@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import AboutTabPanel, { AboutProps } from "./tabs/aboutTab";
-import CampaignsTabPanel from "./tabs/campaignsTab";
+import CampaignsTabPanel, { ICampaignsTabPanel } from "./tabs/campaignsTab";
 import CommunicationTabPanel from "./tabs/communicationTab";
 import ResourcesTabPanel from "./tabs/resourcesTab";
 import TreasuryTabPanel, { TreasuryTabPanelProps } from "./tabs/treasuryTab";
@@ -63,6 +63,7 @@ interface DaoTabsProps {
   resourceProps: any;
   treasuryProps: TreasuryTabPanelProps;
   communicationProps: any;
+  campaignsProps: ICampaignsTabPanel;
 }
 
 const DaoTabs: React.FC<DaoTabsProps> = ({
@@ -70,6 +71,7 @@ const DaoTabs: React.FC<DaoTabsProps> = ({
   resourceProps,
   treasuryProps,
   communicationProps,
+  campaignsProps,
 }) => {
   const resolveTabToProps = (tabName: string) => {
     switch (tabName) {
@@ -81,6 +83,8 @@ const DaoTabs: React.FC<DaoTabsProps> = ({
         return treasuryProps;
       case "Communication":
         return communicationProps;
+      case "Campaigns":
+        return campaignsProps;
       default:
         return {};
     }

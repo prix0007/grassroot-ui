@@ -23,6 +23,9 @@ import DaoTabs from "../../../components/dao/daoTabs";
 import { makeGraphQLInstance } from "../../../graphql";
 import { useDaoQuery } from "../../../hooks/daos";
 
+export const NOT_FOUND_IMAGE =
+  "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png";
+
 const DAO = () => {
   const {
     query: { id },
@@ -62,14 +65,14 @@ const DAO = () => {
               backgroundImage={new URL(
                 data?.daoById?.backgroundPicture ||
                   data?.daoById?.profilePicture ||
-                  ""
+                  NOT_FOUND_IMAGE
               ).toString()}
               backgroundRepeat={"no-repeat"}
               backgroundSize={"cover"}
               backgroundPosition={"center center"}
             />
             <BackButton
-              //@ts-ignore 
+              //@ts-ignore
               position={"absolute"}
               background={"blackAlpha.700"}
               borderWidth={"1px"}
@@ -100,8 +103,7 @@ const DAO = () => {
               >
                 <Image
                   src={new URL(
-                    data?.daoById?.profilePicture ||
-                      "https://upload.wikimedia.org/wikipedia/commons/d/d1/Image_not_available.png"
+                    data?.daoById?.profilePicture || NOT_FOUND_IMAGE
                   ).toString()}
                   alt={data?.daoById?.name}
                   maxW={150}
@@ -144,6 +146,10 @@ const DAO = () => {
           communicationProps={{}}
           resourceProps={{}}
           treasuryProps={{ adminAddress: data?.daoById?.adminAddress }}
+          campaignsProps={{
+            activeCampaigns: data?.daoById?.activeCampaigns,
+            daoId: data?.daoById?.id,
+          }}
         />
       </Box>
     </VStack>

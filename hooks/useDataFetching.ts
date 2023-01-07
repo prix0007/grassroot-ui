@@ -14,7 +14,6 @@ const useDaosQueries = () => {
           const daoData = {
             daoId: index,
             admin: data.admin,
-            description: data.description,
             name: data.name,
             metadata: {
               ...metadata,
@@ -42,7 +41,6 @@ const useDaoQuery = (id: number) => {
       const daoData = {
         daoId: id,
         admin: data.admin,
-        description: data.description,
         name: data.name,
         metadata: {
           ...metadata,
@@ -53,7 +51,7 @@ const useDaoQuery = (id: number) => {
     staleTime: 2000,
     refetchInterval: 30000,
     cacheTime: 60 * 60 * 60 * 1000, // 1 hr.
-    enabled: (!!id || id === 0 )&& !!daosContract,
+    enabled: (!!id || id === 0) && !!daosContract,
   });
   return queryDao;
 };

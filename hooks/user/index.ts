@@ -5,7 +5,10 @@ import { UserRejectedRequestError } from "@web3-react/injected-connector";
 import { GraphQLClient } from "graphql-request";
 import { useEffect, useState } from "react";
 import { makeGraphQLInstance } from "../../graphql";
-import { CREATE_NONCE, CREATE_USER_OR_LOGIN } from "../../graphql/mutations";
+import {
+  CREATE_NONCE,
+  CREATE_USER_OR_LOGIN,
+} from "../../graphql/mutations/user";
 import { GET_LOGGED_IN_USER } from "../../graphql/queries/getUser";
 import { ACCESS_TOKEN_KEYS } from "../../localStorageKeys";
 import { decodeToken, formatMessage } from "../../util";
@@ -72,7 +75,7 @@ const useSignInUser = (account: string) => {
     isError: nonceIsError,
     isLoading: nonceIsLoading,
   } = useMutation({
-    mutationKey: "createNonce",
+    mutationKey: ["createNonce"],
     mutationFn: () => {
       return client.request(CREATE_NONCE, {
         address: account,
@@ -87,7 +90,7 @@ const useSignInUser = (account: string) => {
     isError: userIsError,
     isLoading: userIsLoading,
   } = useMutation({
-    mutationKey: "createUser",
+    mutationKey: ["createUser"],
     mutationFn: (signature: string) => {
       return client.request(CREATE_USER_OR_LOGIN, {
         signature: signature,

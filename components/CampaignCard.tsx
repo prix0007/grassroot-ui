@@ -37,34 +37,57 @@ import { GrassrootCrowdfunding } from "../contracts/types";
 import { useMemo, useState } from "react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
+import { Campaign } from "../hooks/campaigns";
+import { NOT_FOUND_IMAGE } from "../pages/dao/[id]";
+import { ICampaignFormState } from "../pages/dao/[id]/campaign/new";
 
 type ICampaignCard = {
-  campaign: ICampaignBC;
+  campaign: ICampaignFormState;
+  newCampaignData: Campaign;
   contract: GrassrootCrowdfunding;
 };
 
-const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
+const CampaignCard: React.FC<ICampaignCard> = ({
+  campaign,
+  newCampaignData,
+  contract,
+}) => {
   const router = useRouter();
 
-  const { chainId } = useWeb3React();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // console.log(newCampaignData);
+  // console.log(contract);
 
   const toast = useToast();
 
   const DECIMALS = 18;
-  const [donateAmount, setDonateAmount] = useState(
-    ethers.utils.formatUnits(campaign.minAmountContribution, DECIMALS)
-  );
+  const [donateAmount, setDonateAmount] = useState(campaign?.basic?.minAmount);
 
   const [isLoading, setLoading] = useState(false);
 
   const handleDonate = async () => {
     if (donateAmount && donateAmount.trim()) {
       setLoading(true);
+
+      if (!contract) {
+        toast({
+          title: `Failed to Connect to Wallet`,
+          duration: 3000,
+          status: "error",
+          isClosable: true,
+          description: `Please check your connection to the wallet.`,
+        });
+        return;
+      }
+
       try {
         const finalAmount = ethers.utils.parseUnits(donateAmount, 18);
 
-        const tx = await contract.donate(campaign.id, finalAmount);
+        const tx = await contract.donate(
+          newCampaignData.campaignId,
+          finalAmount
+        );
         await tx.wait();
 
         toast({
@@ -75,16 +98,17 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
           status: "success",
         });
       } catch (e) {
+        console.log(e);
         toast({
           title: `Error Occured`,
           duration: 3000,
           colorScheme: "red",
           status: "error",
           isClosable: true,
-          description: `${e.data.message}`,
+          description: `${e?.data?.message}`,
         });
       }
-      setDonateAmount(campaign.minAmountContribution.toString());
+      setDonateAmount(campaign.basic.minAmount.toString());
       onClose();
       setLoading(false);
     } else {
@@ -104,9 +128,7 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>
-            Donate to {ethers.utils.parseBytes32String(campaign.campaignName)}
-          </ModalHeader>
+          <ModalHeader>Donate to {newCampaignData.title}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <InputGroup>
@@ -151,12 +173,11 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
         pos={"absolute"}
         left={0}
         top={0}
-        backgroundImage={
-          "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-        }
+        backgroundImage={new URL(
+          newCampaignData?.images[0] || NOT_FOUND_IMAGE
+        ).toString()}
         backgroundSize={"cover"}
-      >
-      </Box>
+      ></Box>
       <Box
         maxW={"445px"}
         w={"full"}
@@ -176,7 +197,7 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
             fontSize={"sm"}
             letterSpacing={1.1}
           >
-            {CATEGORIES[campaign.category]}
+            {campaign?.basic?.category}
           </Text>
           <Stack
             display={"flex"}
@@ -189,10 +210,10 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
               fontSize={"2xl"}
               fontFamily={"body"}
             >
-              {ethers.utils.parseBytes32String(campaign.campaignName)}
+              {newCampaignData.title}
             </Heading>
             <Link
-              href={`${router.asPath}/campaign/${campaign.id}`}
+              href={`${router.asPath}/campaign/${newCampaignData.id}`}
               style={{ padding: 0, margin: 0 }}
             >
               <ExternalLinkIcon />
@@ -201,7 +222,7 @@ const CampaignCard: React.FC<ICampaignCard> = ({ campaign, contract }) => {
         </Stack>
         <Divider my={2} />
         <Stack direction={"row"} spacing={4} align={"center"}>
-          <Jdenticon value={campaign.campaignAdmin} size={"40"} />
+          <Jdenticon value={campaign?.adminDetails?.address} size={"40"} />
           <Stack
             direction={"column"}
             alignItems={"end"}
