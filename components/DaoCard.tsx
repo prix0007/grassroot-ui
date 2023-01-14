@@ -52,12 +52,21 @@ const DAOCard: React.FC<DAOCardProps> = ({
     >
       <NextLink href={href}>
         <Flex direction={{ base: "column" }} justify="center" p="10px">
-          <Box mb={{ base: "20px", "2xl": "20px" }} position="relative">
+          <Box
+            mb={{ base: "20px", "2xl": "20px" }}
+            maxH={"200px"}
+            position="relative"
+            overflow={"hidden"}
+            borderRadius="20px"
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+          >
             <Image
               src={image}
               w={{ base: "100%", "3xl": "100%" }}
               h={{ base: "100%", "3xl": "100%" }}
-              borderRadius="20px"
+              objectFit={"cover"}
             />
             {/* <Button
             position="absolute"
