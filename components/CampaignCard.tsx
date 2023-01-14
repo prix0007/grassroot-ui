@@ -67,6 +67,7 @@ const CampaignCard: React.FC<ICampaignCard> = ({
   const [isLoading, setLoading] = useState(false);
 
   const handleDonate = async () => {
+    // console.log(newCampaignData.campaignId)
     if (donateAmount && donateAmount.trim()) {
       setLoading(true);
 

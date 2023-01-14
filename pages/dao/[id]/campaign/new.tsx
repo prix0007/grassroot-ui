@@ -448,7 +448,7 @@ const Multistep: React.FC<IPropsMultiStep> = ({
 
       const backendCampaignUpdate: ICreateCampaign = {
         city: metadata.basic.country,
-        campaignId: campaignId.toString(),
+        campaignId: campaignId.sub(1).toString(),
         completionDate: metadata.basic.completionDate,
         country: metadata.basic.country,
         goalAmount: metadata.basic.goalAmount,
@@ -507,7 +507,15 @@ const Multistep: React.FC<IPropsMultiStep> = ({
     // console.log(routeParts);
     router.back();
 
-    localStorage.setItem("story", "");
+    localStorage.setItem(
+      "story",
+      JSON.stringify([
+        {
+          type: "paragraph",
+          children: [{ text: "Start Writing..." }],
+        },
+      ])
+    );
   };
 
   const { mutate: postCampaignToBackend, data: campaignData } = postCampaign(

@@ -134,6 +134,7 @@ const Campaign = () => {
   const contract = useCrowdfundingContract(CONTRACT_ADDRESS);
 
   const handleDonate = async () => {
+    console.log(campaign.id)
     if (donateAmount && donateAmount.trim()) {
       setLoading(true);
       try {
@@ -156,7 +157,7 @@ const Campaign = () => {
           colorScheme: "red",
           status: "error",
           isClosable: true,
-          description: `${e.data.message}`,
+          description: e.toString(),
         });
       }
       setDonateAmount(
@@ -177,8 +178,6 @@ const Campaign = () => {
       });
     }
   };
-
-  const [ipfsCidData, setIpfsCidData] = useState<ICampaignFormState>();
 
   const grayColorModeValue = useColorModeValue("gray.200", "gray.600");
 
@@ -236,7 +235,7 @@ const Campaign = () => {
                 )}
               </Heading>
               <Link
-                href={`/crowdfunding/campaign/${campaign?.id}`}
+                href={`#`}
                 style={{ padding: 0, margin: 0 }}
               >
                 <ExternalLinkIcon />
