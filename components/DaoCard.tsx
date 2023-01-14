@@ -27,22 +27,39 @@ type DAOCardProps = {
   href: string;
 };
 
-export default function DAOCard(props: DAOCardProps) {
-  const { image, name, author, members, href } = props;
-  const [like, setLike] = useState(false);
+const DAOCard: React.FC<DAOCardProps> = ({
+  image,
+  name,
+  author,
+  members,
+  href,
+}) => {
+  // const [like, setLike] = useState(false);
   const textColor = useColorModeValue("navy.700", "white");
   const textColorBid = useColorModeValue("brand.700", "white");
+  const cardBg = useColorModeValue(
+    "linear(to-r, pink.100, pink.300)",
+    "linear(to-r, brand.700, brand.900)"
+  );
+
   return (
-    <Card p="20px">
-      <Flex direction={{ base: "column" }} justify="center">
-        <Box mb={{ base: "20px", "2xl": "20px" }} position="relative">
-          <Image
-            src={image}
-            w={{ base: "100%", "3xl": "100%" }}
-            h={{ base: "100%", "3xl": "100%" }}
-            borderRadius="20px"
-          />
-          <Button
+    <Card
+      borderRadius={"20px"}
+      bgGradient={cardBg}
+      boxShadow="xl"
+      maxW="400px"
+      _hover={{ boxShadow: "md" }}
+    >
+      <NextLink href={href}>
+        <Flex direction={{ base: "column" }} justify="center" p="10px">
+          <Box mb={{ base: "20px", "2xl": "20px" }} position="relative">
+            <Image
+              src={image}
+              w={{ base: "100%", "3xl": "100%" }}
+              h={{ base: "100%", "3xl": "100%" }}
+              borderRadius="20px"
+            />
+            {/* <Button
             position="absolute"
             bg="white"
             _hover={{ bg: "whiteAlpha.900" }}
@@ -65,9 +82,9 @@ export default function DAOCard(props: DAOCardProps) {
               as={like ? IoHeart : IoHeartOutline}
               color="brand.700"
             />
-          </Button>
-        </Box>
-        <NextLink href={href}>
+          </Button> */}
+          </Box>
+
           <Flex flexDirection="column" justify="space-between" h="100%">
             <Flex
               justify="space-between"
@@ -137,8 +154,10 @@ export default function DAOCard(props: DAOCardProps) {
               </AvatarGroup>
             </Flex>
           </Flex>
-        </NextLink>
-      </Flex>
+        </Flex>
+      </NextLink>
     </Card>
   );
-}
+};
+
+export default DAOCard;

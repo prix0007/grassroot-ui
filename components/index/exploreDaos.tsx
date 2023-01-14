@@ -31,7 +31,7 @@ const ExploreDaos = () => {
       direction={{ base: "column" }}
     >
       <Heading>Explore DAOs</Heading>
-      <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px">
+      <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px" px={"20px"}>
         {isLoading && <CircularProgress isIndeterminate color={"brand.700"} />}
         {isFetched &&
           !isError &&

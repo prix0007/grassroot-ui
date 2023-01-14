@@ -31,7 +31,7 @@ import { useToast } from "@chakra-ui/react";
 import { useWeb3React } from "@web3-react/core";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { ACCESS_TOKEN_KEYS } from "../../localStorageKeys";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import {
   CATEGORIES,
   COUNTRIES,
@@ -374,7 +374,9 @@ interface IDAOForm {
 }
 
 const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
+  // Hooks at top
   const toast = useToast();
+  const router = useRouter();
 
   const [step, setStep] = useState(1);
 
@@ -387,6 +389,10 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
   const [formState, setFormState] = useState<CreateDAOProps>({
     ...blankCreateDAOForm,
   });
+
+  // A Better way to fetch tokens and check.
+  const { isLoggedIn, accessToken, currentUser } = useSignInUser(account);
+  // console.log({ isLoggedIn, accessToken, currentUser } )
 
   const tagRef = useRef<HTMLInputElement>();
 
@@ -482,8 +488,23 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
     }
   }, [isConnected]);
 
-  // A Better way to fetch tokens and check.
-  const { isLoggedIn, accessToken, currentUser } = useSignInUser(account);
+  // Hook to check if user is logged in and connected.
+  // User needs to be logged in for file uploads.
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!isConnected || !isLoggedIn) {
+        toast({
+          title: "Error!!",
+          description: `Your are required to loggedIn and wallet connected to access this feature.`,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        router.back();
+      }
+    }, 5000);
+    return () => clearTimeout(timeout);
+  });
 
   const fileMutation = useMutation({
     mutationFn: (metadata: any) => {
@@ -539,7 +560,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
             daoData: formState,
             ipfsMetadata: fileRepsonse,
             transactionData: txReceipt,
-          }
+          },
         };
         daoCreate.mutate(variables);
         toast({

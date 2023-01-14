@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from "graphql-request";
 
 export const CREATE_NONCE = gql`
   mutation GenerateNonce($address: String!) {
@@ -12,11 +12,8 @@ export const CREATE_NONCE = gql`
 
 export const CREATE_USER_OR_LOGIN = gql`
   mutation SignupOrLogin($address: String!, $signature: String!) {
-    signupOrLogin(data: {
-      address: $address,
-      signature: $signature
-    }) {
-      accessToken,
+    signupOrLogin(data: { address: $address, signature: $signature }) {
+      accessToken
       refreshToken
     }
   }

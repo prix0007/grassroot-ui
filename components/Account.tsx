@@ -80,7 +80,8 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
                 } else if (error instanceof UnsupportedChainIdError) {
                   walletErrors(
                     WalletErrorsType.UNSUPPORTED_CHAIN,
-                    error.toString()
+                    "Switch to Polygon Testnet Mumbai network to use application." ||
+                      error.toString()
                   );
                 } else {
                   walletErrors(WalletErrorsType.OTHER, error.toString());

@@ -19,6 +19,7 @@ import {
 import { useRouter } from "next/router";
 import React from "react";
 import BackButton from "../../../components/common/BackButton";
+import AboutDao from "../../../components/dao/aboutDao";
 import DaoTabs from "../../../components/dao/daoTabs";
 import { makeGraphQLInstance } from "../../../graphql";
 import { useDaoQuery } from "../../../hooks/daos";
@@ -132,17 +133,18 @@ const DAO = () => {
           </Flex>
         )}
       </Box>
+      <AboutDao
+        metadata={data?.daoById?.metadata?.daoData}
+        transactionHash={
+          data?.daoById?.metadata?.transactionData?.transactionHash
+        }
+        ipfsMetadata={{
+          cid: data?.daoById?.metadata?.ipfsMetadata?.data?.metadataCid,
+          url: data?.daoById?.metadata?.ipfsMetadata?.data?.metadataUrl,
+        }}
+      />
       <Box width={"100%"} p={"10px"}>
         <DaoTabs
-          aboutProps={{
-            metadata: data?.daoById?.metadata?.daoData,
-            transactionHash:
-              data?.daoById?.metadata?.transactionData?.transactionHash,
-            ipfsMetadata: {
-              cid: data?.daoById?.metadata?.ipfsMetadata?.data?.metadataCid,
-              url: data?.daoById?.metadata?.ipfsMetadata?.data?.metadataUrl,
-            },
-          }}
           communicationProps={{}}
           resourceProps={{}}
           treasuryProps={{ adminAddress: data?.daoById?.adminAddress }}

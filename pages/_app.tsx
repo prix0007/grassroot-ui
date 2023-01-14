@@ -2,49 +2,46 @@ import { Web3ReactProvider } from "@web3-react/core";
 import type { AppProps } from "next/app";
 import getLibrary from "../getLibrary";
 import { Box, ChakraProvider, Flex, HStack } from "@chakra-ui/react";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  gql,
-} from "@apollo/client";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import theme from "../theme";
-import SideNavbar from "../components/Sidebar";
+// import SideNavbar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
-
-const client = new ApolloClient({
-  uri:
-    process.env.NEXT_PUBLIC_BACKEND_URL + "/graphql" ||
-    "http://localhost:3000/graphql",
-  cache: new InMemoryCache(),
-});
+import Head from "next/head";
+import Footer from "../components/Footer";
 
 const queryClient = new QueryClient();
 
 function NextWeb3App({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ApolloProvider client={client}>
-        <ChakraProvider theme={theme}>
-          <Web3ReactProvider getLibrary={getLibrary}>
-            <Navbar />
-            <Flex alignItems={"stretch"}>
-              <Flex
-                flexGrow={1}
-                flexDirection={"column"}
-                alignItems={"center"}
-                justifyContent={"flex-start"}
-              >
-                <Box width={"100%"} maxWidth={"1920px"}>
-                  <Component {...pageProps} />
-                </Box>
-              </Flex>
+      <ChakraProvider theme={theme}>
+        <Web3ReactProvider getLibrary={getLibrary}>
+          <Head>
+            <title>Grassroot</title>
+            <link rel="icon" href="/grassroot_small.png" />
+            <meta
+              name="description"
+              content="Grassroot is all in one solution for DAO. You can create, manage and communicate with your DAO Community with ease from Grassroot."
+            />
+          </Head>
+          <Navbar />
+          <Flex alignItems={"stretch"}>
+            <Flex
+              flexGrow={1}
+              flexDirection={"column"}
+              alignItems={"center"}
+              justifyContent={"flex-start"}
+            >
+              <Box width={"100%"} maxWidth={"1920px"}>
+                <Component {...pageProps} />
+              </Box>
             </Flex>
-          </Web3ReactProvider>
-        </ChakraProvider>
-      </ApolloProvider>
+          </Flex>
+          <Footer />
+        </Web3ReactProvider>
+      </ChakraProvider>
     </QueryClientProvider>
   );
 }

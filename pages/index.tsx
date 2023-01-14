@@ -4,6 +4,8 @@ import Head from "next/head";
 import ExploreDaos from "../components/index/exploreDaos";
 import IndexHero from "../components/index/hero";
 
+// export const config = { amp: true }
+
 function Home() {
   const { account, library } = useWeb3React();
 
@@ -11,7 +13,7 @@ function Home() {
     <div>
       <Head>
         <title>Grassroot</title>
-        <link rel="icon" href="/favicon.ico" />
+        
       </Head>
       <Box>
         <IndexHero />

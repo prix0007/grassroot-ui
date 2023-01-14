@@ -50,10 +50,7 @@ export const decodeToken = (token: string) => {
   return jwt.decode(token);
 };
 
-export enum Type {
-  "transaction",
-  "address",
-}
+export type Type = "transaction" | "address";
 
 export interface Links {
   url: string;
@@ -65,9 +62,9 @@ const explorerPrefixes = {
 
 const typeToLink = (type: Type, prefix: string, link: string) => {
   switch (type) {
-    case Type.transaction:
+    case "transaction":
       return `https://${prefix}/tx/${link}`;
-    case Type.address:
+    case "address":
       return `https://${prefix}/address/${link}`;
     default:
       return `https://${prefix}/${link}`;

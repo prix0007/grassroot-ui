@@ -2,7 +2,6 @@ import { useToast } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
 import { UserRejectedRequestError } from "@web3-react/injected-connector";
-import { GraphQLClient } from "graphql-request";
 import { useEffect, useState } from "react";
 import { makeGraphQLInstance } from "../../graphql";
 import {
@@ -130,7 +129,11 @@ const useSignInUser = (account: string) => {
       if (error instanceof UserRejectedRequestError) {
         walletErrors(WalletErrorsType.USER_REJECTED, error.message);
       } else if (error instanceof UnsupportedChainIdError) {
-        walletErrors(WalletErrorsType.UNSUPPORTED_CHAIN, error.message);
+        walletErrors(
+          WalletErrorsType.UNSUPPORTED_CHAIN,
+          "Switch to Polygon Mumbai Test Network to use Application." ||
+            error.message
+        );
       } else {
         walletErrors(WalletErrorsType.OTHER, error.message);
       }

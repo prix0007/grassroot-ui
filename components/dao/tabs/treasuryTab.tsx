@@ -60,7 +60,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               href={
                 resolveBlockchainLinks(
                   network,
-                  Type.transaction,
+                  "transaction",
                   assetTransfer?.hash
                 ).url
               }
@@ -78,7 +78,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               href={
                 resolveBlockchainLinks(
                   network,
-                  Type.address,
+                  "address",
                   assetTransfer?.from
                 ).url
               }
@@ -91,7 +91,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               target={"_blank"}
               rel={"noopener noreferrer"}
               href={
-                resolveBlockchainLinks(network, Type.address, assetTransfer?.to)
+                resolveBlockchainLinks(network, "address", assetTransfer?.to)
                   .url
               }
             >
@@ -118,7 +118,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               href={
                 resolveBlockchainLinks(
                   network,
-                  Type.transaction,
+                  "transaction",
                   assetTransfer?.hash
                 ).url
               }
@@ -136,7 +136,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               href={
                 resolveBlockchainLinks(
                   network,
-                  Type.address,
+                  "address",
                   assetTransfer?.from
                 ).url
               }
@@ -149,7 +149,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               target={"_blank"}
               rel={"noopener noreferrer"}
               href={
-                resolveBlockchainLinks(network, Type.address, assetTransfer?.to)
+                resolveBlockchainLinks(network, "address", assetTransfer?.to)
                   .url
               }
             >
@@ -173,7 +173,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               href={
                 resolveBlockchainLinks(
                   network,
-                  Type.transaction,
+                  "transaction",
                   assetTransfer?.hash
                 ).url
               }
@@ -191,7 +191,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               href={
                 resolveBlockchainLinks(
                   network,
-                  Type.address,
+                  "address",
                   assetTransfer?.from
                 ).url
               }
@@ -204,7 +204,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               target={"_blank"}
               rel={"noopener noreferrer"}
               href={
-                resolveBlockchainLinks(network, Type.address, assetTransfer?.to)
+                resolveBlockchainLinks(network, "address", assetTransfer?.to)
                   .url
               }
             >
@@ -229,7 +229,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               href={
                 resolveBlockchainLinks(
                   network,
-                  Type.transaction,
+                  "transaction",
                   assetTransfer?.hash
                 ).url
               }
@@ -247,7 +247,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               href={
                 resolveBlockchainLinks(
                   network,
-                  Type.address,
+                  "address",
                   assetTransfer?.from
                 ).url
               }
@@ -260,7 +260,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
               target={"_blank"}
               rel={"noopener noreferrer"}
               href={
-                resolveBlockchainLinks(network, Type.address, assetTransfer?.to)
+                resolveBlockchainLinks(network, "address", assetTransfer?.to)
                   .url
               }
             >
@@ -316,7 +316,7 @@ const TreasuryTabPanel: React.FC<TreasuryTabPanelProps> = ({
         target={"_blank"}
         rel={"noopener noreferrer"}
         href={
-          resolveBlockchainLinks("maticmum", Type.address, adminAddress).url
+          resolveBlockchainLinks("maticmum", "address", adminAddress).url
         }
       >
         <Text textAlign={"right"} fontWeight={"bold"}>

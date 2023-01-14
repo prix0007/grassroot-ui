@@ -190,7 +190,18 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
           w="full"
           rounded="md"
           value={basicDetails.title}
-          onChange={handleChange}
+          onChange={(e) => {
+            if (e.target.value.length > 32) {
+              toast({
+                title: "Title must be less than 32 chars.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+              });
+              return;
+            }
+            handleChange(e);
+          }}
         />
       </FormControl>
       <FormControl as={GridItem} colSpan={6}>

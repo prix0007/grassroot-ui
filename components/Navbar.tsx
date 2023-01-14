@@ -34,27 +34,27 @@ import useEagerConnect from "../hooks/useEagerConnect";
 import grassrootIcon from "../public/grassroot_full.png";
 import Image from "next/image";
 import ETHBalance from "./ETHBalance";
-import { shortenHex } from "../util";
+import { resolveBlockchainLinks, shortenHex } from "../util";
 import Jdenticon from "react-jdenticon";
 import { useSignInUser, useTokensQuery } from "../hooks/user";
 import TokenBalance from "./TokenBalance";
 
 const USDC_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS;
 
-const NavLink = ({ children }: { children: ReactNode }) => (
-  <ChakraLink
-    px={2}
-    py={1}
-    rounded={"md"}
-    _hover={{
-      textDecoration: "none",
-      bg: useColorModeValue("gray.200", "gray.700"),
-    }}
-    href={"#"}
-  >
-    {children}
-  </ChakraLink>
-);
+// const NavLink = ({ children }: { children: ReactNode }) => (
+//   <ChakraLink
+//     px={2}
+//     py={1}
+//     rounded={"md"}
+//     _hover={{
+//       textDecoration: "none",
+//       bg: useColorModeValue("gray.200", "gray.700"),
+//     }}
+//     href={"#"}
+//   >
+//     {children}
+//   </ChakraLink>
+// );
 
 export default function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -138,10 +138,22 @@ export default function Navbar() {
                           <ETHBalance />
                         </MenuItem>
                         <MenuItem>
-                          <TokenBalance
-                            symbol="USDT"
-                            tokenAddress={USDC_TOKEN_ADDRESS}
-                          />
+                          <Link
+                            href={
+                              resolveBlockchainLinks(
+                                "maticmum",
+                                "address",
+                                USDC_TOKEN_ADDRESS
+                              ).url
+                            }
+                            target="_blank"
+                            rel="noreferrer noopenner"
+                          >
+                            <TokenBalance
+                              symbol="USDT"
+                              tokenAddress={USDC_TOKEN_ADDRESS}
+                            />
+                          </Link>
                         </MenuItem>
                         <MenuItem onClick={deactivate}>Logout</MenuItem>
                       </MenuList>

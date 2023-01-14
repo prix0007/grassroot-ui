@@ -53,10 +53,12 @@ export default function IndexHero() {
               To All Dao Needs!
             </Text>
           </Heading>
-          <Text color={"gray.500"}>
-            A place to manage, create and Engage wiht your daos. Make your daos
-            legal with ease and create and engaging following for the cause you
-            stand for.
+          <Text
+            color={"black.500"}
+            fontWeight={"semibold"}
+            fontSize={{ base: "md", md: "lg", xl: "xl" }}
+          >
+            A place to manage, create and engage with DAOs.
           </Text>
           <Stack
             spacing={{ base: 4, sm: 6 }}
@@ -65,18 +67,18 @@ export default function IndexHero() {
             <Button
               rounded={"full"}
               size={"lg"}
-              fontWeight={"normal"}
+              fontWeight={"bold"}
+              color={"white"}
               px={6}
-              colorScheme={"brand.700"}
               bg={"brand.700"}
               _hover={{ bg: "brand.800" }}
               onClick={() => {
                 router.push("/dao/create");
               }}
             >
-              Get started
+              Start a DAO
             </Button>
-            <Button
+            {/* <Button
               rounded={"full"}
               size={"lg"}
               fontWeight={"normal"}
@@ -84,7 +86,7 @@ export default function IndexHero() {
               leftIcon={<PlayIcon h={4} w={4} color={"gray.300"} />}
             >
               How It Works
-            </Button>
+            </Button> */}
           </Stack>
         </Stack>
         <Flex
@@ -111,7 +113,7 @@ export default function IndexHero() {
             width={"full"}
             overflow={"hidden"}
           >
-            <IconButton
+            {/* <IconButton
               aria-label={"Play Button"}
               variant={"ghost"}
               _hover={{ bg: "transparent" }}
@@ -122,16 +124,14 @@ export default function IndexHero() {
               left={"50%"}
               top={"50%"}
               transform={"translateX(-50%) translateY(-50%)"}
-            />
+            /> */}
             <Image
               alt={"Hero Image"}
-              fit={"cover"}
+              fit={"contain"}
               align={"center"}
               w={"100%"}
               h={"100%"}
-              src={
-                "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=800&q=80"
-              }
+              src={"/hero_banner.png"}
             />
           </Box>
         </Flex>
