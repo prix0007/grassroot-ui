@@ -58,7 +58,7 @@ export default function IndexHero() {
             fontWeight={"semibold"}
             fontSize={{ base: "md", md: "lg", xl: "xl" }}
           >
-            A place to manage, create and engage with DAOs.
+            A place to create, manage and engage with DAOs.
           </Text>
           <Stack
             spacing={{ base: 4, sm: 6 }}

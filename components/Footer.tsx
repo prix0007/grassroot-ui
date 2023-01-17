@@ -9,6 +9,7 @@ import {
   Stack,
   Text,
   useColorMode,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import * as React from "react";
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
@@ -18,10 +19,12 @@ import Image from "next/image";
 
 const Footer = () => {
   const { colorMode } = useColorMode();
+  const bg = useColorModeValue("white", "brand.900");
+  const dividerCol = useColorModeValue("black", "white");
 
   return (
-    <SimpleLayout bg={"brand.900"} mt={"100px"}>
-      <Stack
+    <SimpleLayout bg={bg} mt={"100px"}>
+      {/* <Stack
         spacing="8"
         direction={{ base: "column", md: "row" }}
         justify="space-between"
@@ -49,7 +52,7 @@ const Footer = () => {
           direction={{ base: "column-reverse", md: "column", lg: "row" }}
           spacing={{ base: "12", md: "8" }}
         >
-          {/* <Stack direction="row" spacing="8">
+          <Stack direction="row" spacing="8">
           <Stack spacing="4" minW="36" flex="1">
             <Text fontSize="sm" fontWeight="semibold" color="subtle">
               Product
@@ -85,10 +88,10 @@ const Footer = () => {
               Subscribe
             </Button>
           </Stack>
-        </Stack> */}
         </Stack>
-      </Stack>
-      <Divider />
+        </Stack>
+      </Stack> */}
+      <Divider color={dividerCol} height={2} opacity={1} />
       <Stack
         pt="8"
         pb="12"
