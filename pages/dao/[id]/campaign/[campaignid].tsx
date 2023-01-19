@@ -45,7 +45,7 @@ import {
 import Jdenticon from "react-jdenticon";
 import { createEditor, Editor } from "slate";
 import { withHistory } from "slate-history";
-import { withReact } from "slate-react";
+import { Editable, Slate, withReact } from "slate-react";
 
 import BackButton from "../../../../components/common/BackButton";
 import { CATEGORIES } from "../../../../components/campaignSteps/step2";
@@ -56,6 +56,8 @@ import { formatEtherscanLink, shortenHex } from "../../../../util";
 import { ICampaignFormState } from "./new";
 import { useCampaignById } from "../../../../hooks/campaigns";
 import { NOT_FOUND_IMAGE } from "..";
+import ImageViewer from "react-image-viewer-hook/dist/ImageViewer";
+import ImageViewerGallery from "../../../../components/ImageViewer";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
@@ -134,7 +136,6 @@ const Campaign = () => {
   const contract = useCrowdfundingContract(CONTRACT_ADDRESS);
 
   const handleDonate = async () => {
-    console.log(campaign.id)
     if (donateAmount && donateAmount.trim()) {
       setLoading(true);
       try {
@@ -187,6 +188,27 @@ const Campaign = () => {
   // Update the initial content to be pulled from Local Storage if it exists.
   // const initialValue = useMemo(() => ipfsCidData?.story, [ipfsCidData]);
 
+  const images = useMemo(() => {
+    if (!newCampaign?.images) {
+      return undefined;
+    }
+    return newCampaign?.images;
+  }, [newCampaign]);
+
+  const storyValue = useMemo(() => {
+    const story = JSON.parse(
+      newCampaign?.metadata?.metadata?.story ||
+        JSON.stringify([
+          {
+            type: "paragraph",
+            children: [{ text: "Loading...." }],
+          },
+        ])
+    );
+
+    return story;
+  }, [newCampaign]);
+
   return (
     <Container maxW={"7xl"}>
       <br />
@@ -208,6 +230,7 @@ const Campaign = () => {
             h={{ base: "100%", sm: "400px", lg: "500px" }}
           />
         </Flex>
+        <ImageViewerGallery images={images} />
         <Stack spacing={{ base: 6, md: 6 }}>
           <Box as={"header"}>
             <Text
@@ -230,14 +253,9 @@ const Campaign = () => {
                 fontWeight={600}
                 fontSize={{ base: "2xl", sm: "4xl", lg: "5xl" }}
               >
-                {ethers.utils.parseBytes32String(
-                  campaign?.campaignName || Array(32).fill(0)
-                )}
+                {newCampaign?.title}
               </Heading>
-              <Link
-                href={`#`}
-                style={{ padding: 0, margin: 0 }}
-              >
+              <Link href={`#`} style={{ padding: 0, margin: 0 }}>
                 <ExternalLinkIcon />
               </Link>
             </Stack>
@@ -396,7 +414,11 @@ const Campaign = () => {
                 })}
               </Flex>
               <StackDivider borderColor={grayColorModeValue} />
-
+              <Stack>
+                <Slate editor={editor} value={storyValue}>
+                  <Editable />
+                </Slate>
+              </Stack>
               <StackDivider borderColor={grayColorModeValue} />
               <Stack>
                 <Heading size={"lg"}>Rewards</Heading>
@@ -429,6 +451,7 @@ const Campaign = () => {
                   })}
                 </Flex>
               </Stack>
+
               <Stack>
                 <Heading size={"md"}>Socials</Heading>
                 <Flex display={"flex"} flexWrap={"wrap"}>

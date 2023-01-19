@@ -30,11 +30,13 @@ const ImageDropperMany: React.FC<ImageDropperManyProps> = ({
 }) => {
   const toast = useToast();
   const mutation = useMutation({
-    mutationFn: (file: File) => {
+    mutationFn: (files: File[]) => {
       const form = new FormData();
-      form.append("file", file);
+      files.forEach((file) => {
+        form.append("files", file, file.name);
+      });
       return axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/files/uploadImage`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/files/uploadImages`,
         form,
         {
           headers: {
@@ -54,7 +56,7 @@ const ImageDropperMany: React.FC<ImageDropperManyProps> = ({
     },
     onSuccess: (fileRepsonse) => {
       const {
-        data: { imageUrl },
+        data,
       } = fileRepsonse;
       toast({
         title: "Uploaded Image",
@@ -63,14 +65,13 @@ const ImageDropperMany: React.FC<ImageDropperManyProps> = ({
         duration: 3000,
         isClosable: true,
       });
-      return handleFileUploaded(propKey, [...currentImages, imageUrl]);
+      const uploadedImageUrls = data?.map((image) => image.imageUrl);
+      return handleFileUploaded(propKey, [...currentImages, ...uploadedImageUrls]);
     },
   });
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    acceptedFiles.forEach((file: File) => {
-      mutation.mutate(file);
-    });
+    mutation.mutate(acceptedFiles);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

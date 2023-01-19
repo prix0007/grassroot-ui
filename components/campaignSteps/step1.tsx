@@ -175,7 +175,13 @@ const Step1: React.FC<IForm1> = ({ adminDetails, setAdminDetails }) => {
         <FormLabel htmlFor="address" fontWeight={"normal"}>
           Your Wallet Address
         </FormLabel>
-        <Input id="address" type="text" disabled value={adminDetails.address} onChange={() => {}}/>
+        <Input
+          id="address"
+          type="text"
+          disabled
+          value={adminDetails.address}
+          onChange={() => {}}
+        />
         <FormHelperText>This is prefilled your ETH Address.</FormHelperText>
       </FormControl>
       <FormControl mt="2%">
@@ -227,6 +233,12 @@ const Step1: React.FC<IForm1> = ({ adminDetails, setAdminDetails }) => {
           placeholder="Enter a Website"
           value={newWebsite}
           onChange={(e) => setNewWebsite(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleAddWebsite();
+              e.preventDefault();
+            }
+          }}
         />
         <InputRightElement width="7.5rem">
           <Button
