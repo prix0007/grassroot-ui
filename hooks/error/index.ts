@@ -8,11 +8,11 @@ export enum WalletErrorsType {
 
 const useWalletErrors = () => {
   const toast = useToast();
-  return (type: WalletErrorsType, e: String) => {
+  return (type: WalletErrorsType, e: string, title?: string) => {
     switch (type) {
       case WalletErrorsType.USER_REJECTED:
         toast({
-          title: "User Rejected Wallet Request!!",
+          title: title || "User Rejected Wallet Request!!",
           status: "error",
           description: e || "Some Error Occured!!",
           isClosable: true,
@@ -20,15 +20,15 @@ const useWalletErrors = () => {
         break;
       case WalletErrorsType.UNSUPPORTED_CHAIN:
         toast({
-            title: "Change your Network in Wallet!!",
-            status: "error",
-            description: e || "Some Error Occured!!",
-            isClosable: true,
-          });
+          title: title || "Change your Network in Wallet!!",
+          status: "error",
+          description: e || "Some Error Occured!!",
+          isClosable: true,
+        });
         break;
       case WalletErrorsType.OTHER:
         toast({
-          title: "Some Error Occured!!",
+          title: title || "Some Error Occured!!",
           status: "error",
           description: e || "Some Error Occured!!",
           isClosable: true,

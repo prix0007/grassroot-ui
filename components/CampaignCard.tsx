@@ -26,15 +26,11 @@ import {
   useToast,
   CircularProgress,
 } from "@chakra-ui/react";
-import { ICampaignBC } from "../hooks/useCrowdfundingState";
 
 import Jdenticon from "react-jdenticon";
 import { shortenHex, formatEtherscanLink } from "../util";
-import { ethers } from "ethers";
-import { CATEGORIES } from "./campaignSteps/step2";
-import { useWeb3React } from "@web3-react/core";
-import { GrassrootCrowdfunding } from "../contracts/types";
-import { useMemo, useState } from "react";
+import { Contract, ethers } from "ethers";
+import { useState } from "react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import { Campaign } from "../hooks/campaigns";
@@ -44,7 +40,7 @@ import { ICampaignFormState } from "../pages/dao/[id]/campaign/new";
 type ICampaignCard = {
   campaign: ICampaignFormState;
   newCampaignData: Campaign;
-  contract: GrassrootCrowdfunding;
+  contract: Contract;
 };
 
 const CampaignCard: React.FC<ICampaignCard> = ({
@@ -55,9 +51,6 @@ const CampaignCard: React.FC<ICampaignCard> = ({
   const router = useRouter();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  // console.log(newCampaignData);
-  // console.log(contract);
 
   const toast = useToast();
 
@@ -99,7 +92,6 @@ const CampaignCard: React.FC<ICampaignCard> = ({
           status: "success",
         });
       } catch (e) {
-        console.log(e);
         toast({
           title: `Error Occured`,
           duration: 3000,

@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import React, { useState } from "react";
-import useTokenAllowance from "../hooks/useTokenAllowance";
 import useTokenContract from "../hooks/useTokenContract";
 
 type IAllowanceToken = {
@@ -24,11 +23,11 @@ const AllowanceToken: React.FC<IAllowanceToken> = ({
 }) => {
   const [amount, setAmount] = useState("");
 
-  const { data } = useTokenAllowance(
-    address,
-    tokenAddress,
-    spenderAddress
-  );
+  // const { data } = useTokenAllowance(
+  //   address,
+  //   tokenAddress,
+  //   spenderAddress
+  // );
 
   const contract = useTokenContract(tokenAddress);
 
@@ -79,7 +78,8 @@ const AllowanceToken: React.FC<IAllowanceToken> = ({
         justifyContent={"center"}
       >
         <Text m={2} textAlign={"center"}>
-          Current Allowance: {ethers.utils.formatUnits(data?.toString() || "0", 18)} USDC
+          Current Allowance: 
+          {/* {ethers.utils.formatUnits(data?.toString() || "0", 18)} USDC */}
         </Text>
         <Button colorScheme={"green"} onClick={giveAllowance} disabled={isLoading}>
           {isLoading ? (

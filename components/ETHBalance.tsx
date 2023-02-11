@@ -1,13 +1,23 @@
 import type { Web3Provider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
-import useETHBalance from "../hooks/useETHBalance";
+import { useBalance } from "wagmi";
 import { parseBalance } from "../util";
 
-const ETHBalance = () => {
-  const { account } = useWeb3React<Web3Provider>();
-  const { data } = useETHBalance(account);
+type IETHBalance = {
+  address?: `0x${string}`;
+};
 
-  return <p>Balance: {parseBalance(data ?? 0)}</p>;
+const ETHBalance: React.FC<IETHBalance> = ({ address }) => {
+  const { data, isError, isLoading } = useBalance({
+    address,
+  });
+
+  if (isLoading) return <div>Fetching balance…</div>;
+  if (isError) return <div>Error fetching balance</div>;
+  return (
+    <p>
+      Balance: {data?.formatted} {data?.symbol}
+    </p>
+  );
 };
 
 export default ETHBalance;

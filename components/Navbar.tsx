@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -18,6 +18,7 @@ import {
   IconButton,
   Text,
   Circle,
+  useToast,
 } from "@chakra-ui/react";
 
 import Link from "next/link";
@@ -28,8 +29,6 @@ import {
   SunIcon,
 } from "@chakra-ui/icons";
 import Account from "./Account";
-import { useWeb3React } from "@web3-react/core";
-import useEagerConnect from "../hooks/useEagerConnect";
 
 import grassrootIcon from "../public/grassroot_full.png";
 import Image from "next/image";
@@ -38,8 +37,10 @@ import { resolveBlockchainLinks, shortenHex } from "../util";
 import Jdenticon from "react-jdenticon";
 import { useSignInUser, useTokensQuery } from "../hooks/user";
 import TokenBalance from "./TokenBalance";
+import { useAccount, useDisconnect } from "wagmi";
+import { networkContract } from "../constants";
 
-const USDC_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS;
+const USDC_TOKEN_ADDRESS = networkContract["maticmum"].TOKEN_ADDRESS;
 
 // const NavLink = ({ children }: { children: ReactNode }) => (
 //   <ChakraLink
@@ -58,14 +59,31 @@ const USDC_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS;
 
 export default function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
+  const toast = useToast();
+  const { address, isConnected } = useAccount({
+    onDisconnect: () => {
+      toast({
+        title: "Wallet disconnected successfully",
+        status: "warning",
+        duration: 3000,
+      });
+    },
+  });
+  const { disconnect } = useDisconnect();
 
-  const { account, library, deactivate } = useWeb3React();
+  const { isLoggedIn, accessToken, refreshToken } = useSignInUser(address);
 
-  const triedToEagerConnect = useEagerConnect();
+  // DOM Loaded
 
-  const isConnected = typeof account === "string" && !!library;
+  const [isDomLoaded, setDomLoaded] = useState(false);
 
-  const { isLoggedIn, accessToken, refreshToken } = useSignInUser(account);
+  useEffect(() => {
+    if (window !== undefined) {
+      setDomLoaded(true);
+    } else {
+      setDomLoaded(false);
+    }
+  }, []);
 
   return (
     <>
@@ -94,9 +112,7 @@ export default function Navbar() {
               <Button onClick={toggleColorMode}>
                 {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               </Button>
-
-              <Account triedToEagerConnect={triedToEagerConnect} />
-
+              <Account />
               {isConnected && (
                 <Menu>
                   {({ isOpen, onClose }) => (
@@ -116,13 +132,13 @@ export default function Navbar() {
                             <CloseIcon />
                           </IconButton>
                         ) : (
-                          <Jdenticon size={"30"} value={account ?? ""} />
+                          <Jdenticon size={"30"} value={address ?? ""} />
                         )}
                       </MenuButton>
                       <MenuList alignItems={"center"}>
                         <Center p={0}>
-                          <Link href={`/profile/${account}`}>
-                            <Text>{account && shortenHex(account, 4)}</Text>
+                          <Link href={`/profile/${address}`}>
+                            <Text>{address && shortenHex(address, 4)}</Text>
                           </Link>
                           {isLoggedIn && (
                             <CheckCircleIcon color="green" ml={2} />
@@ -130,12 +146,7 @@ export default function Navbar() {
                         </Center>
                         <MenuDivider />
                         <MenuItem>
-                          <Link href={`/profile/${account}`}>
-                            <Text>Your Profile</Text>
-                          </Link>
-                        </MenuItem>
-                        <MenuItem>
-                          <ETHBalance />
+                          <ETHBalance address={address} />
                         </MenuItem>
                         <MenuItem>
                           <Link
@@ -151,11 +162,11 @@ export default function Navbar() {
                           >
                             <TokenBalance
                               symbol="USDT"
-                              tokenAddress={USDC_TOKEN_ADDRESS}
+                              tokenAddress={USDC_TOKEN_ADDRESS as `0x${string}`}
                             />
                           </Link>
                         </MenuItem>
-                        <MenuItem onClick={deactivate}>Logout</MenuItem>
+                        <MenuItem onClick={() => disconnect()}>Logout</MenuItem>
                       </MenuList>
                     </>
                   )}

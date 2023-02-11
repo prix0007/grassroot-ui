@@ -1,7 +1,12 @@
 import Crowdfunding_ABI from "../contracts/GrassrootCrowdfunding.json";
 import type { GrassrootCrowdfunding } from "../contracts/types/GrassrootCrowdfunding";
-import useContract from "./useContract";
+import { useContract } from "wagmi";
+import { Signer } from "ethers";
 
-export default function useCrowdfundingContract(contractAddress?: string) {
-  return useContract<GrassrootCrowdfunding>(contractAddress, Crowdfunding_ABI);
+export default function useCrowdfundingContract(contractAddress?: string, signer?: Signer) {
+  return useContract({
+    address: contractAddress,
+    abi: Crowdfunding_ABI,
+    signerOrProvider: signer
+  });
 }

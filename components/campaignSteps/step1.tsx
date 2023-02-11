@@ -14,7 +14,6 @@ import {
   Box,
   Text,
 } from "@chakra-ui/react";
-import { useWeb3React } from "@web3-react/core";
 import { useState } from "react";
 import { BsFillImageFill } from "react-icons/bs";
 import { makeGraphQLInstance } from "../../graphql";
@@ -179,7 +178,8 @@ const Step1: React.FC<IForm1> = ({ adminDetails, setAdminDetails }) => {
           id="address"
           type="text"
           disabled
-          value={adminDetails.address}
+          placeholder={adminDetails.address}
+          readOnly={true}
           onChange={() => {}}
         />
         <FormHelperText>This is prefilled your ETH Address.</FormHelperText>

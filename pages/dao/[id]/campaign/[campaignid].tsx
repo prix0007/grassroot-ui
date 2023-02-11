@@ -28,11 +28,11 @@ import {
   CardBody,
   Tag,
 } from "@chakra-ui/react";
-import { useWeb3React } from "@web3-react/core";
 import axios from "axios";
 import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
+import { useSigner } from "wagmi";
 import {
   FaDiscord,
   FaFacebook,
@@ -49,8 +49,6 @@ import { Editable, Slate, withReact } from "slate-react";
 
 import BackButton from "../../../../components/common/BackButton";
 import { CATEGORIES } from "../../../../components/campaignSteps/step2";
-import useCrowdfundingContract from "../../../../hooks/useCrowdfundingContract";
-import useCrowdfundingState from "../../../../hooks/useCrowdfundingState";
 import { formatEtherscanLink, shortenHex } from "../../../../util";
 
 import { ICampaignFormState } from "./new";
@@ -58,8 +56,12 @@ import { useCampaignById } from "../../../../hooks/campaigns";
 import { NOT_FOUND_IMAGE } from "..";
 import ImageViewer from "react-image-viewer-hook/dist/ImageViewer";
 import ImageViewerGallery from "../../../../components/ImageViewer";
+import useCrowdfundingContract from "../../../../hooks/useCrowdfundingContract";
+import useCrowdfundingContractState from "../../../../hooks/useCrowdfundingContractState";
+import { networkContract } from "../../../../constants";
+import { useNetwork } from "wagmi";
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+const CONTRACT_ADDRESS = networkContract["maticmum"].CAMPAIGNS_ADDRESS;
 
 export const SocialSlugToIcon = (socialSlug: string) => {
   switch (socialSlug) {
@@ -78,6 +80,8 @@ export const SocialSlugToIcon = (socialSlug: string) => {
 
 const Campaign = () => {
   const router = useRouter();
+  const { chain } = useNetwork();
+
   const handleBack = () => {
     router.back();
   };
@@ -91,11 +95,8 @@ const Campaign = () => {
   }, [router.asPath]);
 
   const toast = useToast();
-  const { chainId } = useWeb3React();
 
   const DECIMALS = 18;
-
-  const { data } = useCrowdfundingState(CONTRACT_ADDRESS);
 
   const {
     data: campaignData,
@@ -106,13 +107,11 @@ const Campaign = () => {
   const newCampaign = useMemo(() => campaignData?.campaignById, [campaignData]);
   const ipfsMetadata = newCampaign?.metadata?.metadata;
 
-  // console.log(ipfsMetadata);
-  // console.log(newCampaign);
-  // console.log(data);
+  const { campaigns } = useCrowdfundingContractState({ chainId: chain?.id });
 
   const campaign = useMemo(() => {
-    return data?.campaigns[newCampaign?.campaignId - 1];
-  }, [data?.campaigns]);
+    return campaigns?.at(campaignData?.campaignById);
+  }, [campaigns]);
 
   const [donateAmount, setDonateAmount] = useState(
     ethers.utils.formatUnits(campaign?.minAmountContribution || "0", DECIMALS)
@@ -134,6 +133,7 @@ const Campaign = () => {
   const validUntilDate = new Date(newCampaign?.completionDate);
 
   const contract = useCrowdfundingContract(CONTRACT_ADDRESS);
+  const { data: signer, isError: signerError } = useSigner();
 
   const handleDonate = async () => {
     if (donateAmount && donateAmount.trim()) {
@@ -141,7 +141,9 @@ const Campaign = () => {
       try {
         const finalAmount = ethers.utils.parseUnits(donateAmount, 18);
 
-        const tx = await contract.donate(campaign.id, finalAmount);
+        const tx = await contract
+          .connect(signer)
+          .donate(campaign.id, finalAmount);
         await tx.wait();
 
         toast({
@@ -323,7 +325,7 @@ const Campaign = () => {
               target="_blank"
               rel="noopener noreferrer"
               href={formatEtherscanLink("Account", [
-                chainId,
+                chain?.id,
                 campaign?.campaignAdmin,
               ])}
             >
@@ -349,7 +351,7 @@ const Campaign = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 href={formatEtherscanLink("Account", [
-                  chainId,
+                  chain?.id,
                   campaign?.campaignAdmin,
                 ])}
               >

@@ -1,7 +1,5 @@
 import { useToast } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
-import { UserRejectedRequestError } from "@web3-react/injected-connector";
 import { useEffect, useState } from "react";
 import { makeGraphQLInstance } from "../../graphql";
 import {
@@ -13,6 +11,12 @@ import { ACCESS_TOKEN_KEYS } from "../../localStorageKeys";
 import { decodeToken, formatMessage } from "../../util";
 import { useWalletErrors, WalletErrorsType } from "../../hooks/error";
 import useLocalStorage from "../useLocalStorage";
+import {
+  ChainMismatchError,
+  useAccount,
+  UserRejectedRequestError,
+  useSigner,
+} from "wagmi";
 
 const useUserQuery = (token: string) => {
   // Logged In Query
@@ -47,9 +51,8 @@ const useTokensQuery = (account: string) => {
 
 const useSignInUser = (account: string) => {
   // Try to decouple this later
-  const { library } = useWeb3React();
-  const isConnected = typeof account === "string" && !!library;
-
+  const { isConnected } = useAccount();
+  const { data: signer } = useSigner();
   const walletErrors = useWalletErrors();
   const [tokens, setToken] = useLocalStorage(ACCESS_TOKEN_KEYS, "");
   const [isSigning, setIsSigning] = useState(false);
@@ -119,7 +122,6 @@ const useSignInUser = (account: string) => {
 
   // Utility Function to take user Signin
   const handleSign = async (nonce: string, account: string) => {
-    const signer = library.getSigner();
     const message = formatMessage(nonce);
     try {
       const signature = await signer?.signMessage(message);
@@ -128,7 +130,7 @@ const useSignInUser = (account: string) => {
     } catch (error) {
       if (error instanceof UserRejectedRequestError) {
         walletErrors(WalletErrorsType.USER_REJECTED, error.message);
-      } else if (error instanceof UnsupportedChainIdError) {
+      } else if (error instanceof ChainMismatchError) {
         walletErrors(
           WalletErrorsType.UNSUPPORTED_CHAIN,
           "Switch to Polygon Mumbai Test Network to use Application." ||

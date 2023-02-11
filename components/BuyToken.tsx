@@ -9,8 +9,8 @@ import {
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import React, { useState } from "react";
+import { useContractRead, useSigner } from "wagmi";
 import useTokenContract from "../hooks/useTokenContract";
-import useTokenState from "../hooks/useTokenState";
 
 type IBuyToken = {
   tokenAddress: string;
@@ -18,10 +18,10 @@ type IBuyToken = {
 const BuyToken: React.FC<IBuyToken> = ({ tokenAddress }) => {
   const [amount, setAmount] = useState("");
 
-  const contract = useTokenContract(tokenAddress);
+  const { data: signer } = useSigner();
+  const contract = useTokenContract(tokenAddress, signer);
 
   const [isLoading, setLoading] = useState(false);
-  const { data } = useTokenState(tokenAddress);
 
   const toast = useToast();
 
@@ -68,7 +68,7 @@ const BuyToken: React.FC<IBuyToken> = ({ tokenAddress }) => {
         justifyContent={"center"}
       >
         <Text m={2} textAlign={"center"}>
-          1 MATIC = {data?.ratio} USDC
+          {/* 1 MATIC = {data?.ratio} USDC */}
         </Text>
         <Button colorScheme={"green"} onClick={buyToken} disabled={isLoading}>
           {isLoading ? (

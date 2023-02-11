@@ -28,7 +28,6 @@ import {
 } from "@chakra-ui/react";
 
 import { useToast } from "@chakra-ui/react";
-import { useWeb3React } from "@web3-react/core";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { ACCESS_TOKEN_KEYS } from "../../localStorageKeys";
 import Router, { useRouter } from "next/router";
@@ -40,12 +39,17 @@ import {
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
 import useDAOSContract from "../../hooks/useDAOContract";
-import { DAOS } from "../../contracts/types";
+
 import { makeGraphQLInstance } from "../../graphql";
 import { postDao, POSTDAOProps } from "../../hooks/daos";
 import ImageDropper from "../../components/ImageDropper";
 import BackButton from "../../components/common/BackButton";
 import { useSignInUser } from "../../hooks/user";
+import { useAccount, useSigner } from "wagmi";
+import { Contract } from "ethers";
+import { networkContract } from "../../constants";
+
+const DAOS_CONTRACT_ADDRESS = networkContract["maticmum"].DAOS_ADDRESS;
 
 export type CreateDAOPropsBC = {
   name: string;
@@ -370,7 +374,7 @@ const Form2: React.FC<Form2> = ({
 };
 
 interface IDAOForm {
-  daoContract: DAOS;
+  daoContract: Contract;
 }
 
 const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
@@ -382,16 +386,14 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
 
   const [progress, setProgress] = useState(50.0);
 
-  const { account, library } = useWeb3React();
-
-  const isConnected = library && typeof account === "string";
+  const { address, isConnected } = useAccount();
 
   const [formState, setFormState] = useState<CreateDAOProps>({
     ...blankCreateDAOForm,
   });
 
   // A Better way to fetch tokens and check.
-  const { isLoggedIn, accessToken, currentUser } = useSignInUser(account);
+  const { isLoggedIn, accessToken, currentUser } = useSignInUser(address);
   // console.log({ isLoggedIn, accessToken, currentUser } )
 
   const tagRef = useRef<HTMLInputElement>();
@@ -483,7 +485,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
     if (isConnected) {
       setFormState({
         ...formState,
-        adminAddress: account,
+        adminAddress: address,
       });
     }
   }, [isConnected]);
@@ -514,6 +516,7 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
         new Blob([JSON.stringify(metadata)], { type: "application/json" })
       );
 
+      // TODO: Move this to API Hook
       return axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/files/uploadFile`,
         form,
@@ -681,7 +684,8 @@ const DAOForm: React.FC<IDAOForm> = ({ daoContract }) => {
 };
 
 const CreateDao = () => {
-  const DAOContract = useDAOSContract(process.env.NEXT_PUBLIC_DAOS_ADDRESS);
+  const { data: signer } = useSigner();
+  const DAOContractWithSigner = useDAOSContract(DAOS_CONTRACT_ADDRESS, signer);
   return (
     <Stack
       align={"center"}
@@ -693,7 +697,7 @@ const CreateDao = () => {
         <BackButton />
         <Heading ml={"50px"}>Create DAO for your CAUSE</Heading>
       </Flex>
-      <DAOForm daoContract={DAOContract} />
+      <DAOForm daoContract={DAOContractWithSigner} />
     </Stack>
   );
 };

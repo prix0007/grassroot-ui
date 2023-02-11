@@ -10,13 +10,12 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSigner } from "wagmi";
 import { Campaign } from "../../../hooks/campaigns";
 import useCrowdfundingContract from "../../../hooks/useCrowdfundingContract";
-import useCrowdfundingState from "../../../hooks/useCrowdfundingState";
 import CampaignCard from "../../CampaignCard";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-
 export interface ICampaignsTabPanel {
   activeCampaigns?: Array<Campaign>;
   daoId: string;
@@ -27,8 +26,9 @@ const CampaignsTabPanel: React.FC<ICampaignsTabPanel> = ({
   daoId,
 }) => {
   const router = useRouter();
+  const { data: signer } = useSigner();
 
-  const contract = useCrowdfundingContract(CONTRACT_ADDRESS);
+  const contract = useCrowdfundingContract(CONTRACT_ADDRESS, signer);
 
   return (
     <VStack>

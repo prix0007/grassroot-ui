@@ -7,7 +7,6 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { useWeb3React } from "@web3-react/core";
 import axios from "axios";
 import { useEffect, useMemo } from "react";
 import {
@@ -276,8 +275,7 @@ const TransferTableRow: React.FC<TransferTableRowProps> = ({
 const TreasuryTabPanel: React.FC<TreasuryTabPanelProps> = ({
   adminAddress,
 }) => {
-  const { chainId } = useWeb3React();
-
+  
   const query = useQuery({
     queryKey: ["transfersData"],
     queryFn: async () => {

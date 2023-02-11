@@ -24,8 +24,8 @@ import Image from "next/image";
 import { CloseIcon } from "@chakra-ui/icons";
 import ImageDropper from "../ImageDropper";
 import ImageDropperMany from "../ImageDropperMany";
-import { useWeb3React } from "@web3-react/core";
 import { useTokensQuery } from "../../hooks/user";
+import { useAccount } from "wagmi";
 
 type IForm2 = {
   basicDetails: ICampaignBasicDetails;
@@ -145,7 +145,6 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
   const handleAddTag = () => {
     if (tagRef && tagRef.current) {
       const ipTag = tagRef?.current.value as string;
-      console.log(ipTag);
       const newTags = [...basicDetails?.tags, ipTag];
       setBasicDetails("tags", newTags);
       tagRef.current.value = "";
@@ -157,9 +156,9 @@ const Step2: React.FC<IForm2> = ({ basicDetails, setBasicDetails }) => {
     setBasicDetails("tags", newTags);
   };
 
-  const { account } = useWeb3React();
+  const { address } = useAccount();
 
-  const { data, isLoading, isError } = useTokensQuery(account);
+  const { data, isLoading, isError } = useTokensQuery(address);
 
   return (
     <>

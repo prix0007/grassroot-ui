@@ -35,7 +35,7 @@ import { BigNumber, ethers } from "ethers";
 import Step3 from "../../../../components/campaignSteps/step3";
 import Step4 from "../../../../components/campaignSteps/step4";
 import Step5 from "../../../../components/campaignSteps/step5";
-import { useWeb3React } from "@web3-react/core";
+
 import useCrowdfundingContract from "../../../../hooks/useCrowdfundingContract";
 import {
   useSignInUser,
@@ -46,6 +46,8 @@ import useDAOSContract from "../../../../hooks/useDAOContract";
 import { useDaoQuery } from "../../../../hooks/daos";
 import { useUploadFile } from "../../../../hooks/utils";
 import { ICreateCampaign, postCampaign } from "../../../../hooks/campaigns";
+import { useAccount, useNetwork, useSigner } from "wagmi";
+import useCrowdfundingContractState from "../../../../hooks/useCrowdfundingContractState";
 
 // TODO: Rules show in a Modal
 
@@ -191,7 +193,6 @@ interface IPropsMultiStep {
 }
 
 const DAOS_CONTRACT = process.env.NEXT_PUBLIC_DAOS_ADDRESS;
-const CAMPAIGNS_CONTRACT = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
 const Multistep: React.FC<IPropsMultiStep> = ({
   user,
@@ -205,11 +206,15 @@ const Multistep: React.FC<IPropsMultiStep> = ({
   // State Loading Submission
   const [isLoading, setLoading] = useState(false);
 
-  const { account, chainId } = useWeb3React();
+  const { address } = useAccount();
+  const { data: signer } = useSigner();
+  const { chain } = useNetwork();
 
-  const { isLoggedIn, accessToken } = useSignInUser(account);
-  const daosContract = useDAOSContract(DAOS_CONTRACT);
-  const camapaignContract = useCrowdfundingContract(CAMPAIGNS_CONTRACT);
+  const { isLoggedIn, accessToken } = useSignInUser(address);
+  const daosContract = useDAOSContract(DAOS_CONTRACT, signer);
+  const { crowdfundingCount } = useCrowdfundingContractState({
+    chainId: chain?.id,
+  });
 
   const router = useRouter();
 
@@ -224,10 +229,10 @@ const Multistep: React.FC<IPropsMultiStep> = ({
         ...campaignState.adminDetails,
         firstName: user?.firstname,
         lastName: user?.lastname,
-        address: account,
+        address: address,
       },
     });
-  }, [account]);
+  }, [address]);
 
   // Steps
   // Step 1 -> Admin Details
@@ -405,7 +410,7 @@ const Multistep: React.FC<IPropsMultiStep> = ({
     const offset = futureUnixTimeStamp - Date.now();
 
     const finalBCObj = {
-      adminAddress: account,
+      adminAddress: address,
       tokenAddress: metadata.basic.tokenCurrency,
       campaignName: ethers.utils.formatBytes32String(metadata.basic.title),
       metadataCid: cid,
@@ -437,7 +442,7 @@ const Multistep: React.FC<IPropsMultiStep> = ({
       );
       const txReceipt = await tx.wait();
 
-      const campaignId = await camapaignContract._crowdfundingsCounter(); // Get this from counter of campaigns contracts
+      const campaignId = crowdfundingCount; // Get this from counter of campaigns contracts
 
       console.log(campaignId);
 
@@ -548,9 +553,9 @@ const Multistep: React.FC<IPropsMultiStep> = ({
     setLoading(true);
   };
 
-  const handleConnectionValidation = () => {
-    return account && chainId === 80001;
-  };
+  // const handleConnectionValidation = () => {
+  //   return account && chainId === 80001;
+  // };
 
   return (
     <>
@@ -592,20 +597,20 @@ const Multistep: React.FC<IPropsMultiStep> = ({
                 isDisabled={step === 5}
                 onClick={() => {
                   const { success } = handleStepValidation(step);
-                  const isValidNetwork = handleConnectionValidation();
+                  // const isValidNetwork = handleConnectionValidation();
 
-                  if (!isValidNetwork) {
-                    toast({
-                      title: `Connection not found.`,
-                      description:
-                        "Make sure you are connected to your metamask, and you are on polygon mumbai testnet.",
-                      status: "error",
-                      duration: 3000,
-                      isClosable: true,
-                    });
-                  }
-                  console.log(success);
-                  if (success && isValidNetwork) {
+                  // if (!isValidNetwork) {
+                  //   toast({
+                  //     title: `Connection not found.`,
+                  //     description:
+                  //       "Make sure you are connected to your metamask, and you are on polygon mumbai testnet.",
+                  //     status: "error",
+                  //     duration: 3000,
+                  //     isClosable: true,
+                  //   });
+                  // }
+                  // console.log(success);
+                  if (success) {
                     setStep(step + 1);
                     if (step === 5) {
                       setProgress(100);
@@ -652,14 +657,22 @@ const getId = (path: string) => {
 
 const New = () => {
   const router = useRouter();
+  const toast = useToast();
   const handleBack = () => {
     router.back();
   };
 
-  const { account } = useWeb3React();
-  const { isLoggedIn, currentUser } = useSignInUser(account);
+  const { address } = useAccount();
+  const { isLoggedIn, currentUser } = useSignInUser(address);
   useEffect(() => {
     if (!isLoggedIn) {
+      toast({
+        title: "User not connected!!",
+        description: "Signin using wallet to use this feature",
+        duration: 3000,
+        status: "warning",
+        isClosable: true,
+      });
       router.push("/");
     }
   }, [isLoggedIn]);
