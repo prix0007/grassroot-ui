@@ -8,9 +8,11 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { useWeb3React } from "@web3-react/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Campaign } from "../../../hooks/campaigns";
+import { useDaoQuery } from "../../../hooks/daos";
 import useCrowdfundingContract from "../../../hooks/useCrowdfundingContract";
 import useCrowdfundingState from "../../../hooks/useCrowdfundingState";
 import CampaignCard from "../../CampaignCard";
@@ -27,6 +29,9 @@ const CampaignsTabPanel: React.FC<ICampaignsTabPanel> = ({
   daoId,
 }) => {
   const router = useRouter();
+  const { account } = useWeb3React();
+
+  const { data: dao } = useDaoQuery({ id: daoId });
 
   const contract = useCrowdfundingContract(CONTRACT_ADDRESS);
 
@@ -34,9 +39,12 @@ const CampaignsTabPanel: React.FC<ICampaignsTabPanel> = ({
     <VStack>
       <Flex justifyContent={"space-between"} w={"100%"}>
         <Heading>Explore Daos Campaigns</Heading>
-        <Button as={"div"} colorScheme={"blue"}>
-          <Link href={`${router.asPath}/campaign/new`}>New</Link>
-        </Button>
+        {/* TODO: Make it more extractable */}
+        {dao?.daoById?.adminAddress === account && (
+          <Button as={"div"} colorScheme={"blue"}>
+            <Link href={`${router.asPath}/campaign/new`}>New</Link>
+          </Button>
+        )}
       </Flex>
       <Box w="100%" py={4} background={"none"}>
         <Grid
