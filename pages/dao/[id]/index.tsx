@@ -149,6 +149,7 @@ const DAO = () => {
           cid: data?.daoById?.metadata?.ipfsMetadata?.data?.metadataCid,
           url: data?.daoById?.metadata?.ipfsMetadata?.data?.metadataUrl,
         }}
+        daoId={data?.daoById?.id}
       />
       <Box width={"100%"} p={"10px"}>
         <DaoTabs

@@ -14,7 +14,6 @@ import { useRouter } from "next/router";
 import { Campaign } from "../../../hooks/campaigns";
 import { useDaoQuery } from "../../../hooks/daos";
 import useCrowdfundingContract from "../../../hooks/useCrowdfundingContract";
-import useCrowdfundingState from "../../../hooks/useCrowdfundingState";
 import CampaignCard from "../../CampaignCard";
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
