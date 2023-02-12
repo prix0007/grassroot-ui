@@ -66,7 +66,7 @@ export default function Navbar() {
 
   const isConnected = typeof account === "string" && !!library;
 
-  const { isLoggedIn, accessToken, refreshToken } = useSignInUser(account);
+  const { isLoggedIn } = useSignInUser(account);
 
   return (
     <>
