@@ -77,46 +77,53 @@ const AboutDao: React.FC<IAboutDao> = ({
             </Box>
           </SimpleGrid>
           <Divider my={"20px"} />
-          <Box my={"2px"} display={"inline-flex"} w={"100%"}>
-            <Text>Created on Transaction:</Text>
-            <Link
-              target={"_blank"}
-              rel={"noopener noreferrer"}
-              href={
-                resolveBlockchainLinks(
-                  "maticmum",
-                  "transaction",
-                  transactionHash
-                ).url
-              }
-              ml={"5px"}
-            >
-              <Text
-                color={"brand.700"}
-                fontWeight={"bold"}
-                wordBreak={"break-all"}
-              >
-                {transactionHash}
-              </Text>
-            </Link>
-          </Box>
-          <Box my={"2px"} display={"inline-flex"}>
-            <Text>Metadata of Dao: </Text>
-            <Link
-              target={"_blank"}
-              rel={"noopener noreferrer"}
-              href={ipfsMetadata?.url}
-              ml={"5px"}
-            >
-              <Text
-                color={"green.700"}
-                fontWeight={"bold"}
-                wordBreak={"break-all"}
-              >
-                {ipfsMetadata?.cid}
-              </Text>
-            </Link>
-          </Box>
+          <Flex
+            justifyContent={{ base: "space-between" }}
+            direction={{ base: "column", md: "row" }}
+          >
+            <Box>
+              <Box my={"2px"} display={"inline-flex"} w={"100%"}>
+                <Text>Created on @:</Text>
+                <Link
+                  target={"_blank"}
+                  rel={"noopener noreferrer"}
+                  href={
+                    resolveBlockchainLinks(
+                      "maticmum",
+                      "transaction",
+                      transactionHash
+                    ).url
+                  }
+                  ml={"5px"}
+                >
+                  <Text
+                    color={"brand.700"}
+                    fontWeight={"bold"}
+                    wordBreak={"break-all"}
+                  >
+                    {transactionHash}
+                  </Text>
+                </Link>
+              </Box>
+              <Box my={"2px"} display={"inline-flex"}>
+                <Text>Metadata @: </Text>
+                <Link
+                  target={"_blank"}
+                  rel={"noopener noreferrer"}
+                  href={ipfsMetadata?.url}
+                  ml={"5px"}
+                >
+                  <Text
+                    color={"green.700"}
+                    fontWeight={"bold"}
+                    wordBreak={"break-all"}
+                  >
+                    {ipfsMetadata?.cid}
+                  </Text>
+                </Link>
+              </Box>
+            </Box>
+          </Flex>
           <Divider my={"20px"} />
           <Text textAlign={"left"}>{metadata?.description}</Text>
         </Box>
