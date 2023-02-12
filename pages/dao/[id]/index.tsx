@@ -53,30 +53,32 @@ const DAO = () => {
           <Flex
             flexDirection={{ base: "column", md: "row" }}
             position="relative"
+            minH={{ base: 350, md: 400 }}
             w={"full"}
+            overflow={"hidden"}
+            backgroundImage={new URL(
+              data?.daoById?.backgroundPicture ||
+                data?.daoById?.profilePicture ||
+                NOT_FOUND_IMAGE
+            ).toString()}
+            backgroundRepeat={"no-repeat"}
+            backgroundSize={"cover"}
+            backgroundPosition={"center center"}
           >
             <Box
-              position="absolute"
+              position={"absolute"}
+              w={"100%"}
+              h={"100%"}
               left={0}
               top={0}
-              zIndex={-1}
-              height={"100%"}
-              width={"100%"}
-              overflow={"hidden"}
-              backgroundImage={new URL(
-                data?.daoById?.backgroundPicture ||
-                  data?.daoById?.profilePicture ||
-                  NOT_FOUND_IMAGE
-              ).toString()}
-              backgroundRepeat={"no-repeat"}
-              backgroundSize={"cover"}
-              backgroundPosition={"center center"}
+              background={"rgba(0,0,0,0.5)"}
             />
             <BackButton
               //@ts-ignore
               position={"absolute"}
               background={"blackAlpha.700"}
               borderWidth={"1px"}
+              zIndex={1}
               _hover={{
                 background: "blackAlpha.600",
               }}
@@ -85,35 +87,40 @@ const DAO = () => {
             />
             <Stack
               display={"flex"}
-              direction={flexDir}
+              position={"absolute"}
+              bottom={"0px"}
+              left={"0px"}
+              direction={{
+                base: "column",
+                md: "row",
+              }}
+              justify={"center"}
+              alignItems={"flex-end"}
               w={"100%"}
-              height={"100%"}
-              mt={"350px"}
-              backgroundColor={
-                colorMode === "dark" ? "blackAlpha.700" : "whiteAlpha.700"
-              }
-              backdropBlur={"lg"}
+              h={"100%"}
             >
               <Box
                 display={"flex"}
-                flexBasis={"15%"}
-                justifyContent={"center"}
+                justifyContent={"flex-end"}
                 flexFlow={"column"}
                 alignItems={"center"}
                 alignSelf={"stretch"}
+                mb={"20px"}
+                mt={"10px"}
               >
-                <Image
-                  src={new URL(
-                    data?.daoById?.profilePicture || NOT_FOUND_IMAGE
-                  ).toString()}
-                  alt={data?.daoById?.name}
-                  maxW={150}
-                  maxH={150}
-                  mt={"10px"}
-                  borderRadius={"sm"}
-                />
+                <Box borderRadius={"20px"} overflow={"hidden"}>
+                  <Image
+                    src={new URL(
+                      data?.daoById?.profilePicture || NOT_FOUND_IMAGE
+                    ).toString()}
+                    alt={data?.daoById?.name}
+                    maxW={300}
+                    maxH={300}
+                    borderRadius={"sm"}
+                  />
+                </Box>
               </Box>
-              <Stack
+              {/* <Stack
                 align={"flex-start"}
                 justifyContent={"center"}
                 spacing={6}
@@ -128,7 +135,7 @@ const DAO = () => {
                 <Text wordBreak={"break-all"}>
                   Administered By: {data?.daoById?.adminAddress}
                 </Text>
-              </Stack>
+              </Stack> */}
             </Stack>
           </Flex>
         )}
@@ -142,6 +149,7 @@ const DAO = () => {
           cid: data?.daoById?.metadata?.ipfsMetadata?.data?.metadataCid,
           url: data?.daoById?.metadata?.ipfsMetadata?.data?.metadataUrl,
         }}
+        daoId={data?.daoById?.id}
       />
       <Box width={"100%"} p={"10px"}>
         <DaoTabs

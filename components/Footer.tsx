@@ -111,7 +111,9 @@ const Footer = () => {
           />
           <IconButton
             as="a"
-            href="#"
+            href="https://github.com/grassroot-uk/grassroot-ui"
+            target={"_blank"}
+            rel={"noopener noreferrer"}
             aria-label="GitHub"
             icon={<FaGithub fontSize="1.25rem" />}
           />

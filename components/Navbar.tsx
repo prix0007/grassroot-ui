@@ -38,6 +38,7 @@ import { resolveBlockchainLinks, shortenHex } from "../util";
 import Jdenticon from "react-jdenticon";
 import { useSignInUser, useTokensQuery } from "../hooks/user";
 import TokenBalance from "./TokenBalance";
+import NoticeAlpha from "./banners/NoticeAlpha";
 
 const USDC_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS;
 
@@ -65,10 +66,11 @@ export default function Navbar() {
 
   const isConnected = typeof account === "string" && !!library;
 
-  const { isLoggedIn, accessToken, refreshToken } = useSignInUser(account);
+  const { isLoggedIn } = useSignInUser(account);
 
   return (
     <>
+      <NoticeAlpha />
       <Box bg={useColorModeValue("gray.100", "gray.900")} py={2} px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <Link href={`/`}>
