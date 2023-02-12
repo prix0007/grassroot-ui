@@ -86,6 +86,14 @@ const AboutDao: React.FC<IAboutDao> = ({
     account
   );
 
+  const isDaoAdmin = useMemo(() => {
+    if (!!daoData && !!account) {
+      return daoData?.adminAddress === account;
+    } else {
+      return false;
+    }
+  }, [daoData, account]);
+
   const handleJoin = async () => {
     if (!daosContract || !daoData) {
       toast({
@@ -206,6 +214,12 @@ const AboutDao: React.FC<IAboutDao> = ({
                 <Tooltip label={"You are already a member of this dao."}>
                   <Tag variant={"solid"} colorScheme={"green"}>
                     Member
+                  </Tag>
+                </Tooltip>
+              ) : isDaoAdmin ? (
+                <Tooltip label={"You are admin of this dao."}>
+                  <Tag variant={"solid"} colorScheme={"blue"}>
+                    Admin
                   </Tag>
                 </Tooltip>
               ) : (
